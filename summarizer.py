@@ -92,11 +92,16 @@ Please provide:
 
 1. **HEADLINE**: Create a compelling, intellectually engaging headline for the digest. Reference themes from the most interesting articles. Format should be elegant and substantive - capturing the intellectual essence of the collection.
 
-2. **COMBINED SUMMARY**: Write a 2-3 sentence paragraph summarizing the themes across ALL the articles. This paragraph should:
+2. **COMBINED SUMMARY**: Write a 2-3 sentence paragraph that SPECIFICALLY describes the actual content of these articles. This paragraph should:
    - Start with "This week's {site_name} Digest examines..."
-   - Weave together the main themes, arguments, and ideas from the collection
-   - Be intellectually engaging and sophisticated
+   - Reference SPECIFIC topics, arguments, or subjects from the articles (e.g., specific people, events, concepts, or debates mentioned)
+   - NOT use vague phrases like "themes of spiritual formation" or "cultural engagement" or "the search for community"
+   - Instead, mention CONCRETE specifics like: a particular author's argument, a specific historical figure, a named concept or book, a particular controversy or event
    - About 40-60 words total
+
+   BAD example (too vague): "This week's Digest examines how Christians navigate technology and community, exploring themes of spiritual formation and cultural engagement."
+
+   GOOD example (specific): "This week's Mere Orthodoxy Digest examines smartphone addiction through Tony Reinke's digital minimalism framework, traces J.C. Ryle's influence on Anglican pastoral care, and considers whether evangelical fractures stem from class conflict rather than theological disagreement."
 
 3. **INDIVIDUAL SUMMARIES**: For each article, provide:
    - The article title (exactly as given)
