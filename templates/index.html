@@ -464,7 +464,7 @@
         <form action="/generate" method="POST" id="digest-form">
             <input type="hidden" id="mode" name="mode" value="recent">
 
-            <div class="form-group">
+            <div class="form-group" id="url-group">
                 <label for="url">Website URL</label>
                 <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
             </div>
@@ -553,9 +553,20 @@
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
 
-            // Show/hide content
+            // Show/hide content based on mode
+            const urlGroup = document.getElementById('url-group');
+            const urlInput = document.getElementById('url');
             document.getElementById('mode-recent').classList.toggle('active', mode === 'recent');
             document.getElementById('mode-specific').classList.toggle('active', mode === 'specific');
+
+            // In specific mode, hide URL box; in recent mode, show it
+            if (mode === 'specific') {
+                urlGroup.style.display = 'none';
+                urlInput.removeAttribute('required');
+            } else {
+                urlGroup.style.display = 'block';
+                urlInput.setAttribute('required', '');
+            }
         }
 
         document.getElementById('digest-form').addEventListener('submit', function() {

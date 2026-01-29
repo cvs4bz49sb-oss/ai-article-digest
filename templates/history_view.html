@@ -136,7 +136,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 500;
-            margin-bottom: 8px;
+            margin-right: 8px;
         }
 
         .article-title {
@@ -290,8 +290,7 @@
                     : '';
                 articlesHtml += `
                     <div class="article">
-                        <p class="article-number">${index + 1}.</p>
-                        <p class="article-title"><a href="${escapeHtml(article.url)}" target="_blank">${escapeHtml(article.title)}</a></p>
+                        <p class="article-title"><span class="article-number">${index + 1}.</span> <a href="${escapeHtml(article.url)}" target="_blank">${escapeHtml(article.title)}</a></p>
                         <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                     </div>
                 `;
@@ -360,8 +359,7 @@
                     : '';
                 articlesHtml += `
                     <div class="article">
-                        <p class="article-number">${index + 1}.</p>
-                        <p class="article-title">${escapeHtml(article.title)}</p>
+                        <p class="article-title"><span class="article-number">${index + 1}.</span> ${escapeHtml(article.title)}</p>
                         <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                     </div>
                 `;
@@ -390,7 +388,7 @@
                         h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #5d7a8c; text-align: center; margin-bottom: 30px; }
                         .article { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
                         .article:last-child { border-bottom: none; }
-                        .article-number { color: #5d7a8c; font-size: 13px; margin-bottom: 8px; }
+                        .article-number { color: #5d7a8c; font-size: 13px; margin-right: 8px; }
                         .article-title { font-size: 18px; font-weight: 500; margin-bottom: 12px; }
                         .article-content { color: #4a5568; line-height: 1.8; }
                         .article-content em { color: #2c3e50; }
@@ -429,7 +427,7 @@
                     .combined-summary { font-size: 14pt; text-align: center; margin-bottom: 30pt; color: #4a5568; line-height: 1.6; }
                     h2 { font-size: 12pt; text-transform: uppercase; letter-spacing: 2px; color: #5d7a8c; text-align: center; margin-bottom: 20pt; }
                     .article { margin-bottom: 20pt; }
-                    .article-number { color: #5d7a8c; font-size: 11pt; margin-bottom: 6pt; }
+                    .article-number { color: #5d7a8c; font-size: 11pt; margin-right: 6pt; }
                     .article-title { font-size: 14pt; font-weight: bold; margin-bottom: 8pt; }
                     .article-content { color: #4a5568; line-height: 1.6; font-size: 12pt; }
                 </style>
@@ -445,8 +443,7 @@
                     : '';
                 content += `
                 <div class="article">
-                    <p class="article-number">${index + 1}.</p>
-                    <p class="article-title">${escapeHtml(article.title)}</p>
+                    <p class="article-title"><span class="article-number">${index + 1}.</span> ${escapeHtml(article.title)}</p>
                     <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                 </div>`;
             });

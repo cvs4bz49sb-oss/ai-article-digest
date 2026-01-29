@@ -125,7 +125,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 500;
-            margin-bottom: 8px;
+            margin-right: 8px;
         }
 
         .article-title {
@@ -739,8 +739,7 @@
 
         {% for article in digest.article_summaries %}
         <div class="article">
-            <p class="article-number">{{ loop.index }}.</p>
-            <p class="article-title"><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></p>
+            <p class="article-title"><span class="article-number">{{ loop.index }}.</span> <a href="{{ article.url }}" target="_blank">{{ article.title }}</a></p>
             {% if article.author and article.author != 'Unknown Author' %}
             <p class="article-content"><em class="article-author">{{ article.author }}</em> {{ article.summary }}</p>
             {% else %}
@@ -808,22 +807,31 @@
         function copyAsHTML() {
             // Generate HTML that preserves formatting when pasted into HubSpot
             const brand = window.currentBrand || {};
-            let html = `<h1 style="font-size: 28px; text-align: center; margin-bottom: 20px; color: ${brand.headlineColor || '#2c3e50'};">{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}</h1>`;
+            const headlineColor = brand.headlineColor || '#c9785d';
+            const sectionColor = brand.sectionColor || '#5d7a8c';
+            const titleColor = brand.titleColor || '#c9785d';
+            const bodyColor = brand.bodyColor || '#4a5568';
+            const authorColor = brand.authorColor || '#2c3e50';
+            const headlineSize = brand.headlineSize || 28;
+            const titleSize = brand.titleSize || 18;
+            const bodySize = brand.bodySize || 16;
+            const lineHeight = brand.lineHeight || 1.8;
+
+            let html = `<h1 style="font-family: Georgia, serif; font-size: ${headlineSize}px; text-align: center; margin-bottom: 20px; color: ${headlineColor}; font-weight: 500;">{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}</h1>`;
 
             {% if digest.combined_summary %}
-            html += `<p style="font-size: 16px; text-align: center; margin-bottom: 40px; color: ${brand.bodyColor || '#4a5568'}; line-height: 1.7;">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            html += `<p style="font-family: Georgia, serif; font-size: 16px; text-align: center; margin-bottom: 40px; color: ${bodyColor}; line-height: 1.7;">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% endif %}
 
-            html += `<h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: ${brand.sectionColor || '#5d7a8c'}; text-align: center; margin-bottom: 30px;">Articles</h2>`;
+            html += `<h2 style="font-family: sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: ${sectionColor}; text-align: center; margin-bottom: 30px; font-weight: 500;">Articles</h2>`;
 
             {% for article in digest.article_summaries %}
             html += `<div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;">`;
-            html += `<p style="color: ${brand.sectionColor || '#5d7a8c'}; font-size: 13px; margin-bottom: 8px;">{{ loop.index }}.</p>`;
-            html += `<p style="font-size: ${brand.titleSize || 18}px; font-weight: 500; margin-bottom: 12px;"><a href="{{ article.url }}" style="color: ${brand.titleColor || '#2c3e50'}; text-decoration: none;">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</a></p>`;
+            html += `<p style="font-family: Georgia, serif; font-size: ${titleSize}px; font-weight: 500; margin-bottom: 12px;"><span style="color: ${sectionColor}; font-family: sans-serif; font-size: 13px; margin-right: 8px;">{{ loop.index }}.</span><a href="{{ article.url }}" style="color: ${titleColor}; text-decoration: none;">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</a></p>`;
             {% if article.author and article.author != 'Unknown Author' %}
-            html += `<p style="color: ${brand.bodyColor || '#4a5568'}; line-height: 1.8; font-size: ${brand.bodySize || 16}px;"><em style="color: ${brand.authorColor || '#2c3e50'};">{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            html += `<p style="font-family: Georgia, serif; color: ${bodyColor}; line-height: ${lineHeight}; font-size: ${bodySize}px;"><em style="color: ${authorColor};">{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% else %}
-            html += `<p style="color: ${brand.bodyColor || '#4a5568'}; line-height: 1.8; font-size: ${brand.bodySize || 16}px;">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            html += `<p style="font-family: Georgia, serif; color: ${bodyColor}; line-height: ${lineHeight}; font-size: ${bodySize}px;">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% endif %}
             html += `</div>`;
             {% endfor %}
@@ -919,7 +927,7 @@
                         }
                         .article { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
                         .article:last-child { border-bottom: none; }
-                        .article-number { color: ${brand.sectionColor || '#5d7a8c'}; font-size: 13px; margin-bottom: 8px; }
+                        .article-number { color: ${brand.sectionColor || '#5d7a8c'}; font-size: 13px; margin-right: 8px; }
                         .article-title {
                             font-size: ${brand.titleSize || 18}px;
                             font-weight: 500;
@@ -960,7 +968,7 @@
                     .combined-summary { font-size: 14pt; text-align: center; margin-bottom: 30pt; color: #4a5568; line-height: 1.6; }
                     h2 { font-size: 12pt; text-transform: uppercase; letter-spacing: 2px; color: #5d7a8c; text-align: center; margin-bottom: 20pt; }
                     .article { margin-bottom: 20pt; }
-                    .article-number { color: #5d7a8c; font-size: 11pt; margin-bottom: 6pt; }
+                    .article-number { color: #5d7a8c; font-size: 11pt; margin-right: 6pt; }
                     .article-title { font-size: 14pt; font-weight: bold; margin-bottom: 8pt; }
                     .article-content { color: #4a5568; line-height: 1.6; font-size: 12pt; }
                 </style>
@@ -973,8 +981,7 @@
             {% for article in digest.article_summaries %}
             content += `
                 <div class="article">
-                    <p class="article-number">{{ loop.index }}.</p>
-                    <p class="article-title">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                    <p class="article-title"><span class="article-number">{{ loop.index }}.</span> {{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</p>
                     {% if article.author and article.author != 'Unknown Author' %}
                     <p class="article-content"><em>{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>
                     {% else %}
