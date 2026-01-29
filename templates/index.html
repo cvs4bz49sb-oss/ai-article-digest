@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Article Digest Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 48px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #1a1a2e;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="number"] {
+            width: 120px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .help-text {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Article Digest Generator</h1>
+        <p class="subtitle">Transform any blog into an intellectually rigorous digest</p>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/generate" method="POST" id="digest-form">
+            <div class="form-group">
+                <label for="url">Website URL</label>
+                <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
+                <p class="help-text">Enter the URL of a blog or news site to scrape articles from</p>
+            </div>
+
+            <div class="form-group">
+                <label for="count">Number of Articles</label>
+                <input type="number" id="count" name="count" value="10" min="1" max="20">
+                <p class="help-text">How many recent articles to include (1-20)</p>
+            </div>
+
+            <button type="submit" id="submit-btn">Generate Digest</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">Scraping articles and generating summaries...</p>
+            <p class="loading-text" style="margin-top: 8px;">This may take a minute or two.</p>
+        </div>
+
+        <footer>
+            Powered by Claude AI &middot; <a href="https://github.com/cvs4bz49sb-oss/ai-article-digest" target="_blank">View on GitHub</a>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('digest-form').addEventListener('submit', function() {
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('submit-btn').textContent = 'Generating...';
+            document.getElementById('loading').classList.add('active');
+        });
+    </script>
+</body>
+</html>

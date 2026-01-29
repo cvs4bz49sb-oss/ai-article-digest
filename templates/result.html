@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ digest.headline }} - AI Article Digest</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 48px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-link svg {
+            margin-right: 6px;
+        }
+
+        .headline {
+            color: #1a1a2e;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .meta {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .combined-summary {
+            color: #374151;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .section-title {
+            color: #1a1a2e;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .article {
+            margin-bottom: 28px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .article-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .article-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .article-title {
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .article-author {
+            color: #64748b;
+            font-size: 14px;
+            font-style: italic;
+            margin-bottom: 10px;
+            margin-left: 40px;
+        }
+
+        .article-summary {
+            color: #4b5563;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-left: 40px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
+        .copy-success {
+            display: none;
+            color: #10b981;
+            font-size: 14px;
+            margin-left: 12px;
+            align-items: center;
+        }
+
+        .copy-success.show {
+            display: inline-flex;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+            }
+
+            .headline {
+                font-size: 24px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Generate another digest
+        </a>
+
+        <h1 class="headline">{{ digest.headline }}</h1>
+
+        <p class="meta">Generated from {{ count }} articles at {{ url }}</p>
+
+        <p class="combined-summary">{{ digest.combined_summary }}</p>
+
+        <h2 class="section-title">Articles</h2>
+
+        {% for article in digest.article_summaries %}
+        <div class="article">
+            <div class="article-header">
+                <span class="article-number">{{ loop.index }}</span>
+                <span class="article-title">{{ article.title }}</span>
+            </div>
+            <p class="article-author">{{ article.author }}</p>
+            <p class="article-summary">{{ article.summary }}</p>
+        </div>
+        {% endfor %}
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="copyToClipboard()">Copy as Markdown</button>
+            <a href="/" class="btn btn-secondary">Generate Another</a>
+            <span class="copy-success" id="copy-success">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
+                    <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Copied!
+            </span>
+        </div>
+
+        <footer>
+            Powered by Claude AI &middot; <a href="https://github.com/cvs4bz49sb-oss/ai-article-digest" target="_blank">View on GitHub</a>
+        </footer>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            const markdown = `{{ formatted | replace('\n', '\\n') | replace("'", "\\'") | safe }}`;
+            navigator.clipboard.writeText(markdown.replace(/\\n/g, '\n')).then(function() {
+                document.getElementById('copy-success').classList.add('show');
+                setTimeout(function() {
+                    document.getElementById('copy-success').classList.remove('show');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
