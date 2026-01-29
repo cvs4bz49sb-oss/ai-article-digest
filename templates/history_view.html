@@ -285,11 +285,14 @@
 
             let articlesHtml = '';
             digest.article_summaries.forEach((article, index) => {
+                const authorHtml = article.author && article.author !== 'Unknown Author'
+                    ? `<em>${escapeHtml(article.author)}</em> `
+                    : '';
                 articlesHtml += `
                     <div class="article">
                         <p class="article-number">${index + 1}.</p>
                         <p class="article-title"><a href="${escapeHtml(article.url)}" target="_blank">${escapeHtml(article.title)}</a></p>
-                        <p class="article-content"><em>${escapeHtml(article.author)}</em> ${escapeHtml(article.summary)}</p>
+                        <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                     </div>
                 `;
             });
@@ -352,11 +355,14 @@
 
             let articlesHtml = '';
             digest.article_summaries.forEach((article, index) => {
+                const authorHtml = article.author && article.author !== 'Unknown Author'
+                    ? `<em>${escapeHtml(article.author)}</em> `
+                    : '';
                 articlesHtml += `
                     <div class="article">
                         <p class="article-number">${index + 1}.</p>
                         <p class="article-title">${escapeHtml(article.title)}</p>
-                        <p class="article-content"><em>${escapeHtml(article.author)}</em> ${escapeHtml(article.summary)}</p>
+                        <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                     </div>
                 `;
             });
@@ -434,11 +440,14 @@
                 <h2>Articles</h2>`;
 
             digest.article_summaries.forEach((article, index) => {
+                const authorHtml = article.author && article.author !== 'Unknown Author'
+                    ? `<em>${escapeHtml(article.author)}</em> `
+                    : '';
                 content += `
                 <div class="article">
                     <p class="article-number">${index + 1}.</p>
                     <p class="article-title">${escapeHtml(article.title)}</p>
-                    <p class="article-content"><em>${escapeHtml(article.author)}</em> ${escapeHtml(article.summary)}</p>
+                    <p class="article-content">${authorHtml}${escapeHtml(article.summary)}</p>
                 </div>`;
             });
 

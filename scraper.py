@@ -143,6 +143,19 @@ class ArticleScraper:
         # Remove any trailing/leading punctuation
         author = author.strip(".,;:-|/\\\"'")
 
+        # Normalize multiple author separators to &
+        # Replace various separators with &
+        author = author.replace(" and ", " & ")
+        author = author.replace(", ", " & ")
+        author = author.replace(" + ", " & ")
+        author = author.replace(" / ", " & ")
+
+        # Clean up any double ampersands or spaces around ampersands
+        while " &  & " in author or "& &" in author:
+            author = author.replace(" &  & ", " & ").replace("& &", "&")
+        author = author.replace("  &", " &").replace("&  ", "& ")
+        author = " ".join(author.split()).strip()
+
         return author.strip()
 
     def _is_article_url(self, url: str) -> bool:
@@ -467,5 +480,32 @@ class ArticleScraper:
 
         if not articles:
             raise RuntimeError("Failed to scrape any articles. The website structure may not be supported.")
+
+        return articles, site_name
+
+    def scrape_specific_articles(self, urls: list[str], progress_callback=None) -> tuple[list[Article], str]:
+        """Scrape specific articles by their URLs. Returns (articles, site_name)."""
+        if not urls:
+            raise ValueError("No URLs provided")
+
+        # Get site name from base URL
+        soup = self._fetch_page(self.base_url)
+        site_name = self._extract_site_name(soup) if soup else "the publication"
+
+        if progress_callback:
+            progress_callback(f"Scraping {len(urls)} specific articles...")
+
+        articles = []
+        for i, url in enumerate(urls):
+            if progress_callback:
+                progress_callback(f"Scraping article {i + 1}/{len(urls)}: {url[:60]}...")
+
+            article = self._scrape_article_page(url)
+            if article:
+                articles.append(article)
+                time.sleep(0.5)  # Be polite to the server
+
+        if not articles:
+            raise RuntimeError("Failed to scrape any of the provided articles.")
 
         return articles, site_name

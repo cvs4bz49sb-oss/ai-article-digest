@@ -110,6 +110,11 @@ Please provide:
    - DO NOT include the author's name in the summary - it will be added automatically
    - Maximum 50 words per summary
 
+4. **SOCIAL MEDIA POSTS**: For each article, provide a social media post with:
+   - A compelling headline (can be the article title or a catchier version, max 10 words)
+   - One sentence of compelling and accurate summary (different from the digest summary - more punchy and shareable)
+   - The post should make people want to click and read the full article
+
 Format your response EXACTLY as follows (this format will be parsed programmatically):
 
 HEADLINE: [Your headline here]
@@ -124,6 +129,15 @@ SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
 2. TITLE: [Article 2 title]
 AUTHOR: [Article 2 author]
 SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
+
+[Continue for all articles...]
+
+SOCIAL_POSTS:
+1. POST_HEADLINE: [Catchy headline for social media]
+POST_SUMMARY: [One compelling sentence]
+
+2. POST_HEADLINE: [Catchy headline for social media]
+POST_SUMMARY: [One compelling sentence]
 
 [Continue for all articles...]
 
@@ -165,12 +179,14 @@ class DigestGenerator:
         result = {
             "headline": "",
             "combined_summary": "",
-            "article_summaries": []
+            "article_summaries": [],
+            "social_posts": []
         }
 
         lines = response.strip().split("\n")
         current_section = None
         current_article = {}
+        current_post = {}
 
         for line in lines:
             line = line.strip()
@@ -185,6 +201,12 @@ class DigestGenerator:
                 current_section = "combined_summary"
             elif line.startswith("ARTICLE_SUMMARIES:"):
                 current_section = "articles"
+            elif line.startswith("SOCIAL_POSTS:"):
+                # Save the last article before switching sections
+                if current_article:
+                    result["article_summaries"].append(current_article)
+                    current_article = {}
+                current_section = "social_posts"
             elif current_section == "combined_summary":
                 # Continue building combined summary until we hit ARTICLE_SUMMARIES
                 if not line.startswith(("HEADLINE:", "ARTICLE_SUMMARIES:", "1.", "TITLE:")):
@@ -204,18 +226,41 @@ class DigestGenerator:
                     current_article["author"] = line.replace("AUTHOR:", "").strip()
                 elif line.startswith("SUMMARY:"):
                     current_article["summary"] = line.replace("SUMMARY:", "").strip()
-                elif "summary" in current_article and not line.startswith(("TITLE:", "AUTHOR:", "SUMMARY:")):
+                elif "summary" in current_article and not line.startswith(("TITLE:", "AUTHOR:", "SUMMARY:", "SOCIAL_POSTS:")):
                     # Continuation of summary
                     current_article["summary"] += " " + line
+            elif current_section == "social_posts":
+                if line[0].isdigit() and ". POST_HEADLINE:" in line:
+                    if current_post:
+                        result["social_posts"].append(current_post)
+                    current_post = {
+                        "headline": line.split("POST_HEADLINE:", 1)[1].strip() if "POST_HEADLINE:" in line else ""
+                    }
+                elif line.startswith("POST_HEADLINE:"):
+                    if current_post:
+                        result["social_posts"].append(current_post)
+                    current_post = {"headline": line.replace("POST_HEADLINE:", "").strip()}
+                elif line.startswith("POST_SUMMARY:"):
+                    current_post["summary"] = line.replace("POST_SUMMARY:", "").strip()
+                elif "summary" in current_post and not line.startswith(("POST_HEADLINE:", "POST_SUMMARY:")) and not (line[0].isdigit() and "." in line):
+                    # Continuation of post summary
+                    current_post["summary"] += " " + line
 
-        # Add the last article
+        # Add the last article and post
         if current_article:
             result["article_summaries"].append(current_article)
+        if current_post:
+            result["social_posts"].append(current_post)
 
         # Add URLs from original articles
         for i, summary in enumerate(result["article_summaries"]):
             if i < len(articles):
                 summary["url"] = articles[i].url
+
+        # Add URLs to social posts
+        for i, post in enumerate(result["social_posts"]):
+            if i < len(articles):
+                post["url"] = articles[i].url
 
         # Clean up combined summary
         result["combined_summary"] = " ".join(result["combined_summary"].split())

@@ -209,6 +209,80 @@
             display: inline-flex;
         }
 
+        /* Social Media Section */
+        .social-section {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(93, 122, 140, 0.15);
+        }
+
+        .social-post {
+            background: rgba(93, 122, 140, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .social-post:last-child {
+            margin-bottom: 0;
+        }
+
+        .social-post-headline {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .social-post-summary {
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .social-post-link {
+            font-size: 13px;
+            color: #5d7a8c;
+            word-break: break-all;
+        }
+
+        .social-post-link a {
+            color: #5d7a8c;
+            text-decoration: none;
+        }
+
+        .social-post-link a:hover {
+            text-decoration: underline;
+        }
+
+        .social-post-copy {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(93, 122, 140, 0.1);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #5d7a8c;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .social-post-copy:hover {
+            background: rgba(93, 122, 140, 0.2);
+            color: #2c3e50;
+        }
+
+        .social-post-copy.copied {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+        }
+
         footer {
             text-align: center;
             margin-top: 32px;
@@ -667,12 +741,17 @@
         <div class="article">
             <p class="article-number">{{ loop.index }}.</p>
             <p class="article-title"><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></p>
-            <p class="article-content"><em>{{ article.author }}</em> {{ article.summary }}</p>
+            {% if article.author and article.author != 'Unknown Author' %}
+            <p class="article-content"><em class="article-author">{{ article.author }}</em> {{ article.summary }}</p>
+            {% else %}
+            <p class="article-content">{{ article.summary }}</p>
+            {% endif %}
         </div>
         {% endfor %}
 
         <div class="actions">
             <button class="btn btn-primary" onclick="copyToClipboard()">Copy as Markdown</button>
+            <button class="btn btn-secondary" onclick="copyAsHTML()">Copy for HubSpot</button>
             <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
             <button class="btn btn-secondary" onclick="downloadDOCX()">Download DOCX</button>
             <a href="/" class="btn btn-secondary">Generate Another</a>
@@ -683,6 +762,21 @@
                 Copied!
             </span>
         </div>
+
+        {% if digest.social_posts %}
+        <div class="social-section">
+            <h2 class="section-title">Social Media Posts</h2>
+
+            {% for post in digest.social_posts %}
+            <div class="social-post" id="social-post-{{ loop.index }}">
+                <button class="social-post-copy" onclick="copySocialPost({{ loop.index }})">Copy</button>
+                <p class="social-post-headline">{{ post.headline }}</p>
+                <p class="social-post-summary">{{ post.summary }}</p>
+                <p class="social-post-link"><a href="{{ post.url }}" target="_blank">{{ post.url }}</a></p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <footer>
             Powered by Claude AI
@@ -707,6 +801,59 @@
                 document.getElementById('copy-success').classList.add('show');
                 setTimeout(function() {
                     document.getElementById('copy-success').classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        function copyAsHTML() {
+            // Generate HTML that preserves formatting when pasted into HubSpot
+            const brand = window.currentBrand || {};
+            let html = `<h1 style="font-size: 28px; text-align: center; margin-bottom: 20px; color: ${brand.headlineColor || '#2c3e50'};">{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}</h1>`;
+
+            {% if digest.combined_summary %}
+            html += `<p style="font-size: 16px; text-align: center; margin-bottom: 40px; color: ${brand.bodyColor || '#4a5568'}; line-height: 1.7;">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            {% endif %}
+
+            html += `<h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: ${brand.sectionColor || '#5d7a8c'}; text-align: center; margin-bottom: 30px;">Articles</h2>`;
+
+            {% for article in digest.article_summaries %}
+            html += `<div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;">`;
+            html += `<p style="color: ${brand.sectionColor || '#5d7a8c'}; font-size: 13px; margin-bottom: 8px;">{{ loop.index }}.</p>`;
+            html += `<p style="font-size: ${brand.titleSize || 18}px; font-weight: 500; margin-bottom: 12px;"><a href="{{ article.url }}" style="color: ${brand.titleColor || '#2c3e50'}; text-decoration: none;">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</a></p>`;
+            {% if article.author and article.author != 'Unknown Author' %}
+            html += `<p style="color: ${brand.bodyColor || '#4a5568'}; line-height: 1.8; font-size: ${brand.bodySize || 16}px;"><em style="color: ${brand.authorColor || '#2c3e50'};">{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            {% else %}
+            html += `<p style="color: ${brand.bodyColor || '#4a5568'}; line-height: 1.8; font-size: ${brand.bodySize || 16}px;">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            {% endif %}
+            html += `</div>`;
+            {% endfor %}
+
+            // Use the Clipboard API with HTML mime type
+            const blob = new Blob([html], { type: 'text/html' });
+            const clipboardItem = new ClipboardItem({ 'text/html': blob });
+            navigator.clipboard.write([clipboardItem]).then(function() {
+                document.getElementById('copy-success').classList.add('show');
+                setTimeout(function() {
+                    document.getElementById('copy-success').classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        function copySocialPost(index) {
+            const post = document.getElementById('social-post-' + index);
+            const headline = post.querySelector('.social-post-headline').textContent;
+            const summary = post.querySelector('.social-post-summary').textContent;
+            const link = post.querySelector('.social-post-link a').href;
+
+            const text = headline + '\n\n' + summary + '\n\n' + link;
+
+            navigator.clipboard.writeText(text).then(function() {
+                const btn = post.querySelector('.social-post-copy');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
                 }, 2000);
             });
         }
@@ -828,7 +975,11 @@
                 <div class="article">
                     <p class="article-number">{{ loop.index }}.</p>
                     <p class="article-title">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                    {% if article.author and article.author != 'Unknown Author' %}
                     <p class="article-content"><em>{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                    {% else %}
+                    <p class="article-content">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                    {% endif %}
                 </div>`;
             {% endfor %}
 

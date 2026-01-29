@@ -113,7 +113,70 @@
             width: 100px;
         }
 
-        button {
+        textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            font-size: 14px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            color: white;
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        button[type="submit"] {
             width: 100%;
             padding: 18px 24px;
             background: rgba(255, 255, 255, 0.2);
@@ -399,15 +462,32 @@
         {% endif %}
 
         <form action="/generate" method="POST" id="digest-form">
+            <input type="hidden" id="mode" name="mode" value="recent">
+
             <div class="form-group">
                 <label for="url">Website URL</label>
                 <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
             </div>
 
-            <div class="form-group">
-                <label for="count">Number of Articles</label>
-                <input type="number" id="count" name="count" value="10" min="1" max="20">
-                <p class="help-text">1-20 recent articles</p>
+            <div class="mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
+                <button type="button" class="mode-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
+            </div>
+
+            <div class="mode-content active" id="mode-recent">
+                <div class="form-group">
+                    <label for="count">Number of Articles</label>
+                    <input type="number" id="count" name="count" value="10" min="1" max="20">
+                    <p class="help-text">1-20 recent articles from the site</p>
+                </div>
+            </div>
+
+            <div class="mode-content" id="mode-specific">
+                <div class="form-group">
+                    <label for="specific_urls">Article URLs</label>
+                    <textarea id="specific_urls" name="specific_urls" placeholder="Paste article URLs here, one per line:&#10;https://example.com/article-1&#10;https://example.com/article-2&#10;https://example.com/article-3"></textarea>
+                    <p class="help-text">Paste one URL per line</p>
+                </div>
             </div>
 
             <button type="submit" id="submit-btn">Generate Digest</button>
@@ -462,6 +542,20 @@
             star.style.top = Math.random() * 100 + '%';
             star.style.animationDelay = Math.random() * 3 + 's';
             starsContainer.appendChild(star);
+        }
+
+        // Mode toggle
+        function setMode(mode) {
+            document.getElementById('mode').value = mode;
+
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            // Show/hide content
+            document.getElementById('mode-recent').classList.toggle('active', mode === 'recent');
+            document.getElementById('mode-specific').classList.toggle('active', mode === 'specific');
         }
 
         document.getElementById('digest-form').addEventListener('submit', function() {

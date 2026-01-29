@@ -28,7 +28,9 @@ def history_view():
 def generate():
     """Generate a digest from the submitted URL."""
     url = request.form.get("url", "").strip()
+    mode = request.form.get("mode", "recent")
     count = request.form.get("count", "10")
+    specific_urls = request.form.get("specific_urls", "").strip()
 
     try:
         count = int(count)
@@ -43,9 +45,21 @@ def generate():
         url = "https://" + url
 
     try:
-        # Scrape articles
         scraper = ArticleScraper(url)
-        articles, site_name = scraper.scrape_articles(count)
+
+        if mode == "specific" and specific_urls:
+            # Parse specific URLs from textarea
+            urls_list = [u.strip() for u in specific_urls.split('\n') if u.strip()]
+            urls_list = [u if u.startswith(('http://', 'https://')) else 'https://' + u for u in urls_list]
+
+            if not urls_list:
+                return render_template("index.html", error="Please provide at least one article URL")
+
+            # Scrape specific articles
+            articles, site_name = scraper.scrape_specific_articles(urls_list)
+        else:
+            # Scrape recent articles
+            articles, site_name = scraper.scrape_articles(count)
 
         if not articles:
             return render_template("index.html", error="No articles found at that URL")
