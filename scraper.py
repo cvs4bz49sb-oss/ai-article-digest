@@ -13,7 +13,6 @@ from config import (
     REQUEST_TIMEOUT,
     MAX_RETRIES,
     RETRY_DELAY,
-    ARTICLE_SELECTORS,
 )
 
 
@@ -37,7 +36,6 @@ class ArticleScraper:
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
         })
-        self.selectors = ARTICLE_SELECTORS["default"]
 
     def _fetch_page(self, url: str) -> Optional[BeautifulSoup]:
         """Fetch a page with retry logic."""
@@ -60,88 +58,112 @@ class ArticleScraper:
             robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
             response = self.session.get(robots_url, timeout=10)
             if response.status_code == 200:
-                # Basic check - look for disallow all
                 content = response.text.lower()
                 if "disallow: /" in content and "user-agent: *" in content:
-                    # Check if it's a blanket disallow (simplified check)
                     lines = content.split("\n")
                     for i, line in enumerate(lines):
                         if "user-agent: *" in line:
-                            # Check next few lines for disallow: /
                             for j in range(i + 1, min(i + 5, len(lines))):
                                 if lines[j].strip() == "disallow: /":
                                     return False
             return True
         except requests.RequestException:
-            # If we can't fetch robots.txt, proceed with caution
             return True
 
     def _extract_text(self, element) -> str:
         """Extract clean text from a BeautifulSoup element."""
         if element is None:
             return ""
-        # Remove script and style elements
         for script in element(["script", "style", "nav", "footer", "header"]):
             script.decompose()
         text = element.get_text(separator=" ", strip=True)
-        # Clean up whitespace
         return " ".join(text.split())
 
-    def _find_element(self, soup: BeautifulSoup, selectors: list, parent=None) -> Optional[any]:
-        """Try multiple selectors to find an element."""
-        search_in = parent if parent else soup
-        for selector in selectors:
-            try:
-                element = search_in.select_one(selector)
-                if element:
-                    return element
-            except Exception:
-                continue
-        return None
-
-    def _find_all_elements(self, soup: BeautifulSoup, selectors: list) -> list:
-        """Try multiple selectors to find all matching elements."""
-        for selector in selectors:
-            try:
-                elements = soup.select(selector)
-                if elements:
-                    return elements
-            except Exception:
-                continue
-        return []
+    def _is_article_url(self, url: str) -> bool:
+        """Check if a URL looks like an article (not a tag, category, or utility page)."""
+        skip_patterns = [
+            "/tag/", "/tags/", "/category/", "/categories/",
+            "/author/", "/page/", "/search", "/login", "/signup",
+            "/contact", "/about", "/privacy", "/terms", "/subscribe",
+            "/feed", "/rss", "#", "javascript:", "mailto:"
+        ]
+        url_lower = url.lower()
+        return not any(pattern in url_lower for pattern in skip_patterns)
 
     def _extract_article_links(self, soup: BeautifulSoup) -> list[str]:
         """Extract article links from the main page."""
         links = []
+        parsed_base = urlparse(self.base_url)
+        base_domain = parsed_base.netloc
 
-        # Try to find article containers first
-        articles = self._find_all_elements(soup, self.selectors["article_list"])
+        # Strategy 1: Look for card-based layouts (like Mere Orthodoxy)
+        card_selectors = [
+            ".section--listing--card",
+            ".post-card",
+            ".article-card",
+            ".entry-card",
+            ".blog-card",
+            "[class*='card']"
+        ]
 
-        if articles:
-            for article in articles:
-                # Find links within article containers
-                link_elem = article.find("a", href=True)
-                if link_elem:
-                    href = link_elem.get("href", "")
-                    if href and not href.startswith("#"):
+        for selector in card_selectors:
+            cards = soup.select(selector)
+            if cards:
+                for card in cards:
+                    link = card.find("a", href=True)
+                    if link:
+                        href = link.get("href", "")
                         full_url = urljoin(self.base_url, href)
-                        if full_url not in links:
+                        if (self._is_article_url(full_url) and
+                            base_domain in urlparse(full_url).netloc and
+                            full_url not in links):
                             links.append(full_url)
+                if links:
+                    break
 
-        # If no articles found, look for common blog post link patterns
+        # Strategy 2: Look for article/post containers
         if not links:
-            # Look for links in main content area
-            main_content = soup.find("main") or soup.find(class_=["content", "posts", "blog"])
+            container_selectors = [
+                "article",
+                ".post",
+                ".entry",
+                ".blog-post",
+                ".article-item",
+                "[class*='post']",
+                "[class*='article']"
+            ]
+
+            for selector in container_selectors:
+                containers = soup.select(selector)
+                if containers:
+                    for container in containers:
+                        link = container.find("a", href=True)
+                        if link:
+                            href = link.get("href", "")
+                            full_url = urljoin(self.base_url, href)
+                            if (self._is_article_url(full_url) and
+                                base_domain in urlparse(full_url).netloc and
+                                full_url not in links):
+                                links.append(full_url)
+                    if links:
+                        break
+
+        # Strategy 3: Look in main content area for article-like links
+        if not links:
+            main_content = soup.find("main") or soup.find(class_=["content", "posts", "blog", "articles"])
             if main_content:
                 for link in main_content.find_all("a", href=True):
                     href = link.get("href", "")
-                    # Filter out navigation and utility links
-                    if (href and not href.startswith("#") and
-                        not any(skip in href.lower() for skip in
-                               ["login", "signup", "contact", "about", "privacy", "terms"])):
-                        full_url = urljoin(self.base_url, href)
-                        if full_url not in links and self.base_url in full_url:
-                            links.append(full_url)
+                    full_url = urljoin(self.base_url, href)
+                    parsed_url = urlparse(full_url)
+
+                    # Check if it looks like an article URL (has path segments)
+                    path_parts = [p for p in parsed_url.path.split("/") if p]
+                    if (len(path_parts) >= 1 and
+                        self._is_article_url(full_url) and
+                        base_domain in parsed_url.netloc and
+                        full_url not in links):
+                        links.append(full_url)
 
         return links
 
@@ -152,45 +174,85 @@ class ArticleScraper:
             if not soup:
                 return None
 
-            # Extract title
-            title_elem = self._find_element(soup, self.selectors["title"])
-            title = self._extract_text(title_elem) if title_elem else ""
+            # Extract title - try multiple approaches
+            title = ""
+            title_selectors = [
+                "h1.entry-title",
+                "h1.post-title",
+                "h1.article-title",
+                "article h1",
+                ".post h1",
+                "main h1",
+                "h1"
+            ]
+            for selector in title_selectors:
+                title_elem = soup.select_one(selector)
+                if title_elem:
+                    title = self._extract_text(title_elem)
+                    if title and len(title) < 300:
+                        break
 
-            # If title is too long, it might be content - try to get just the h1
-            if len(title) > 200:
-                h1 = soup.find("h1")
-                if h1:
-                    title = self._extract_text(h1)
+            # Extract author - try multiple approaches
+            author = ""
+            author_selectors = [
+                ".author-name",
+                ".post-author",
+                ".entry-author",
+                ".byline",
+                "[rel='author']",
+                ".author",
+                "[class*='author']"
+            ]
+            for selector in author_selectors:
+                author_elem = soup.select_one(selector)
+                if author_elem:
+                    author = self._extract_text(author_elem)
+                    author = author.replace("By ", "").replace("by ", "").strip()
+                    if author and len(author) < 100:
+                        break
 
-            # Extract author
-            author_elem = self._find_element(soup, self.selectors["author"])
-            author = self._extract_text(author_elem) if author_elem else "Unknown Author"
-
-            # Clean up author text
-            author = author.replace("By ", "").replace("by ", "").strip()
-            if len(author) > 100:
+            if not author:
                 author = "Unknown Author"
 
-            # Extract content
+            # Extract content - try multiple approaches
             content = ""
-            content_elem = self._find_element(soup, self.selectors["content"])
-            if content_elem:
-                content = self._extract_text(content_elem)
+            content_selectors = [
+                ".entry-content",
+                ".post-content",
+                ".article-content",
+                ".post-body",
+                "article .content",
+                "[class*='content']",
+                "article"
+            ]
 
-            # Fallback: get all paragraphs in article or main
-            if not content or len(content) < 100:
-                article_elem = soup.find("article") or soup.find("main")
-                if article_elem:
-                    paragraphs = article_elem.find_all("p")
-                    content = " ".join(self._extract_text(p) for p in paragraphs)
+            for selector in content_selectors:
+                content_elem = soup.select_one(selector)
+                if content_elem:
+                    # Get all paragraphs within the content area
+                    paragraphs = content_elem.find_all("p")
+                    if paragraphs:
+                        content = " ".join(self._extract_text(p) for p in paragraphs if self._extract_text(p))
+                    else:
+                        content = self._extract_text(content_elem)
 
-            if not title or not content:
+                    if content and len(content) > 200:
+                        break
+
+            # Fallback: get all paragraphs in main/article
+            if not content or len(content) < 200:
+                main_elem = soup.find("article") or soup.find("main") or soup.find(class_="post")
+                if main_elem:
+                    paragraphs = main_elem.find_all("p")
+                    content = " ".join(self._extract_text(p) for p in paragraphs if self._extract_text(p))
+
+            if not title or not content or len(content) < 100:
                 return None
 
             return Article(
-                title=title[:500],  # Limit title length
-                author=author[:100],  # Limit author length
-                content=content[:10000],  # Limit content length
+                title=title[:500],
+                author=author[:100],
+                content=content[:10000],
                 url=url
             )
 
@@ -200,14 +262,12 @@ class ArticleScraper:
 
     def scrape_articles(self, count: int, progress_callback=None) -> list[Article]:
         """Scrape articles from the website."""
-        # Check robots.txt
         if not self._check_robots_txt():
             print("Warning: robots.txt may disallow scraping. Proceeding with caution...")
 
         if progress_callback:
             progress_callback("Fetching main page...")
 
-        # Fetch the main page
         soup = self._fetch_page(self.base_url)
         if not soup:
             raise RuntimeError(f"Failed to fetch main page: {self.base_url}")
@@ -215,7 +275,6 @@ class ArticleScraper:
         if progress_callback:
             progress_callback("Extracting article links...")
 
-        # Extract article links
         article_links = self._extract_article_links(soup)
 
         if not article_links:
@@ -226,7 +285,7 @@ class ArticleScraper:
 
         # Scrape individual articles
         articles = []
-        for i, link in enumerate(article_links[:count * 2]):  # Try extra links in case some fail
+        for i, link in enumerate(article_links[:count * 2]):
             if len(articles) >= count:
                 break
 
