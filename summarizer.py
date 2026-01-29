@@ -36,36 +36,36 @@ Your summaries must embody these characteristics:
 ## Summary Format
 
 CRITICAL: Each summary must follow this EXACT format:
-- Start with the author's name in a natural sentence
-- Use active verbs like "examines," "argues," "contends," "traces," "frames," "looks at"
-- The summary flows as a single paragraph starting with the author
+- Start with an active verb (examines, argues, contends, traces, frames, looks at, etc.)
+- DO NOT include the author's name - it will be added automatically
+- The summary flows as a single paragraph
 - Be exactly 50 words or fewer total
 - Present the article's core argument or insight
 
 ## Example Summaries (FOLLOW THIS FORMAT EXACTLY)
 
 Example 1:
-"Marc Sims examines theological principles guiding church architecture, arguing that while church health doesn't depend on building quality, sacred spaces can aid worship by drawing attention heavenward through intentional, non-distracting design that emphasizes God's transcendence."
+"examines theological principles guiding church architecture, arguing that while church health doesn't depend on building quality, sacred spaces can aid worship by drawing attention heavenward through intentional, non-distracting design that emphasizes God's transcendence."
 
 Example 2:
-"Shebuel Varghesee frames the controversial hymn through a third-culture perspective, arguing that for diaspora Christians, the longing for heavenly home reflects genuine existential displacement rather than escapism, offering spiritual comfort to the globally dispersed."
+"frames the controversial hymn through a third-culture perspective, arguing that for diaspora Christians, the longing for heavenly home reflects genuine existential displacement rather than escapism, offering spiritual comfort to the globally dispersed."
 
 Example 3:
-"Michael Horton traces Joachim of Fiore's influence on Western thought, showing how medieval eschatology fused vertical spiritual ascent with historical progress, profoundly shaping utopian ideologies and modern definitions of advancement through science and reason."
+"traces Joachim of Fiore's influence on Western thought, showing how medieval eschatology fused vertical spiritual ascent with historical progress, profoundly shaping utopian ideologies and modern definitions of advancement through science and reason."
 
 Example 4:
-"Joshua Heavin examines J.C. Ryle's practical holiness emphasis, emphasizing his pastoral approach to suffering, faithfulness to Anglican formularies, preaching clarity, and pastoral care for the dying—offering resources for contemporary Christian witness and formation."
+"examines J.C. Ryle's practical holiness emphasis, emphasizing his pastoral approach to suffering, faithfulness to Anglican formularies, preaching clarity, and pastoral care for the dying—offering resources for contemporary Christian witness and formation."
 
 Example 5:
-"John Ehrett looks at evangelical fractures as fundamentally a class conflict between credential-holding elites and working-class congregants, arguing this economic and cultural divide—not theological disagreement—drives much contemporary polarization within American Christianity."
+"looks at evangelical fractures as fundamentally a class conflict between credential-holding elites and working-class congregants, arguing this economic and cultural divide—not theological disagreement—drives much contemporary polarization within American Christianity."
 
-BAD example (doesn't start with author):
-"The administrative state's expansion represents not merely bureaucratic growth but a fundamental reordering of constitutional authority."
+BAD example (includes author name - DON'T DO THIS):
+"Marc Sims examines theological principles guiding church architecture..."
 
 BAD example (too vague):
-"This article discusses religious liberty and its importance in modern society. The author explores various perspectives on the topic."
+"discusses religious liberty and its importance in modern society."
 
-Remember: EVERY summary must begin with the author's name followed by an active verb."""
+Remember: Start with an active VERB, not the author's name. The author name is added separately."""
 
 
 def create_summary_prompt(articles: list[Article]) -> str:
@@ -95,7 +95,8 @@ Please provide:
 2. **INDIVIDUAL SUMMARIES**: For each article, provide:
    - The article title (exactly as given)
    - The author name (exactly as given)
-   - A summary that STARTS WITH THE AUTHOR'S NAME followed by an active verb (examines, argues, traces, frames, looks at, contends, etc.)
+   - A summary that STARTS WITH AN ACTIVE VERB (examines, argues, traces, frames, looks at, contends, etc.)
+   - DO NOT include the author's name in the summary - it will be added automatically
    - Maximum 50 words per summary
 
 Format your response EXACTLY as follows (this format will be parsed programmatically):
@@ -105,15 +106,15 @@ HEADLINE: [Your headline here]
 ARTICLE_SUMMARIES:
 1. TITLE: [Article 1 title]
 AUTHOR: [Article 1 author]
-SUMMARY: [Author name] [active verb] [rest of 50-word max summary]
+SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
 
 2. TITLE: [Article 2 title]
 AUTHOR: [Article 2 author]
-SUMMARY: [Author name] [active verb] [rest of 50-word max summary]
+SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
 
 [Continue for all articles...]
 
-CRITICAL REMINDER: Each summary MUST start with the author's name (e.g., "Marc Sims examines...", "John Smith argues...", "Jane Doe traces..."). This is non-negotiable."""
+CRITICAL: Each summary must START WITH A VERB like "examines", "argues", "traces", "frames", "contends", "looks at". DO NOT start with the author's name."""
 
 
 class DigestGenerator:
