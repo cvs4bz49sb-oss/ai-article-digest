@@ -24,12 +24,6 @@ def history_view():
     return render_template("history_view.html")
 
 
-@app.route("/branding")
-def branding():
-    """Render the branding customization page."""
-    return render_template("branding.html")
-
-
 @app.route("/generate", methods=["POST"])
 def generate():
     """Generate a digest from the submitted URL."""
