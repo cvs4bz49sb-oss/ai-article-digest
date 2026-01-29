@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ digest.headline }} - Article Digest</title>
+    <title>{{ digest.headline }} - Well Done Digest</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -147,6 +147,7 @@
 
         .actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 12px;
             margin-top: 40px;
             padding-top: 32px;
@@ -235,9 +236,13 @@
             Generate another digest
         </a>
 
-        <h1 class="headline">{{ digest.headline }}</h1>
+        <div class="logo-container" id="logo-container" style="display: none; text-align: center; margin-bottom: 24px;">
+            <img id="brand-logo" src="" alt="Logo" style="max-width: 200px; max-height: 80px;">
+        </div>
 
-        <h2 class="section-title">Articles</h2>
+        <h1 class="headline" id="headline">{{ digest.headline }}</h1>
+
+        <h2 class="section-title" id="section-title">Articles</h2>
 
         {% for article in digest.article_summaries %}
         <div class="article">
@@ -249,6 +254,8 @@
 
         <div class="actions">
             <button class="btn btn-primary" onclick="copyToClipboard()">Copy as Markdown</button>
+            <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+            <button class="btn btn-secondary" onclick="downloadDOCX()">Download DOCX</button>
             <a href="/" class="btn btn-secondary">Generate Another</a>
             <span class="copy-success" id="copy-success">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
@@ -284,6 +291,240 @@
                 }, 2000);
             });
         }
+
+        function downloadPDF() {
+            // Use browser print to PDF
+            const printContent = document.querySelector('.container').cloneNode(true);
+
+            // Remove action buttons from print
+            const actions = printContent.querySelector('.actions');
+            if (actions) actions.remove();
+
+            // Remove back link from print
+            const backLink = printContent.querySelector('.back-link');
+            if (backLink) backLink.remove();
+
+            // Remove footer from print
+            const footer = printContent.querySelector('footer');
+            if (footer) footer.remove();
+
+            // Get brand settings
+            const brand = window.currentBrand || {};
+            const logo = window.currentLogo;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>{{ digest.headline }}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+                    <style>
+                        body {
+                            font-family: ${brand.bodyFont || "'Lora', Georgia, serif"};
+                            max-width: 700px;
+                            margin: 40px auto;
+                            padding: 20px;
+                            color: ${brand.bodyColor || '#2c3e50'};
+                        }
+                        .logo-container { text-align: center; margin-bottom: 24px; }
+                        .logo-container img { max-width: 180px; max-height: 60px; }
+                        h1 {
+                            font-size: ${brand.headlineSize || 28}px;
+                            text-align: center;
+                            margin-bottom: 40px;
+                            color: ${brand.headlineColor || '#2c3e50'};
+                            font-family: ${brand.headlineFont || "'Lora', Georgia, serif"};
+                        }
+                        h2 {
+                            font-size: 14px;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                            color: ${brand.sectionColor || '#5d7a8c'};
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                        .article { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
+                        .article:last-child { border-bottom: none; }
+                        .article-number { color: ${brand.sectionColor || '#5d7a8c'}; font-size: 13px; margin-bottom: 8px; }
+                        .article-title {
+                            font-size: ${brand.titleSize || 18}px;
+                            font-weight: 500;
+                            margin-bottom: 12px;
+                        }
+                        .article-title a { color: ${brand.titleColor || '#2c3e50'}; text-decoration: none; }
+                        .article-content {
+                            color: ${brand.bodyColor || '#4a5568'};
+                            line-height: ${brand.lineHeight || 1.8};
+                            font-size: ${brand.bodySize || 16}px;
+                        }
+                        .article-content em { color: ${brand.authorColor || '#2c3e50'}; }
+                    </style>
+                </head>
+                <body>
+                    ${printContent.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+
+        function downloadDOCX() {
+            // Create a simple DOCX-compatible HTML that Word can open
+            const headline = `{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}`;
+            let content = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+            <head>
+                <meta charset="utf-8">
+                <title>${headline}</title>
+                <style>
+                    body { font-family: Georgia, serif; max-width: 700px; margin: 0 auto; }
+                    h1 { font-size: 24pt; text-align: center; margin-bottom: 30pt; }
+                    h2 { font-size: 12pt; text-transform: uppercase; letter-spacing: 2px; color: #5d7a8c; text-align: center; margin-bottom: 20pt; }
+                    .article { margin-bottom: 20pt; }
+                    .article-number { color: #5d7a8c; font-size: 11pt; margin-bottom: 6pt; }
+                    .article-title { font-size: 14pt; font-weight: bold; margin-bottom: 8pt; }
+                    .article-content { color: #4a5568; line-height: 1.6; font-size: 12pt; }
+                </style>
+            </head>
+            <body>
+                <h1>${headline}</h1>
+                <h2>Articles</h2>`;
+
+            {% for article in digest.article_summaries %}
+            content += `
+                <div class="article">
+                    <p class="article-number">{{ loop.index }}.</p>
+                    <p class="article-title">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                    <p class="article-content"><em>{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>
+                </div>`;
+            {% endfor %}
+
+            content += `</body></html>`;
+
+            const blob = new Blob([content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'digest.doc';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // Apply brand settings on page load
+        (function applyBrand() {
+            const savedBrand = localStorage.getItem('digestBrand');
+            const savedLogo = localStorage.getItem('digestBrandLogo');
+
+            if (savedBrand) {
+                const brand = JSON.parse(savedBrand);
+
+                // Apply headline styles
+                const headline = document.getElementById('headline');
+                if (headline) {
+                    headline.style.color = brand.headlineColor || '#2c3e50';
+                    headline.style.fontFamily = brand.headlineFont || "'Lora', Georgia, serif";
+                    headline.style.fontSize = (brand.headlineSize || 32) + 'px';
+                }
+
+                // Apply section title styles
+                const sectionTitle = document.getElementById('section-title');
+                if (sectionTitle) {
+                    sectionTitle.style.color = brand.sectionColor || '#5d7a8c';
+                }
+
+                // Apply article number styles
+                document.querySelectorAll('.article-number').forEach(el => {
+                    el.style.color = brand.sectionColor || '#5d7a8c';
+                });
+
+                // Apply article title styles
+                document.querySelectorAll('.article-title').forEach(el => {
+                    el.style.fontSize = (brand.titleSize || 20) + 'px';
+                });
+                document.querySelectorAll('.article-title a').forEach(el => {
+                    el.style.color = brand.titleColor || '#2c3e50';
+                });
+
+                // Apply body text styles
+                document.querySelectorAll('.article-content').forEach(el => {
+                    el.style.color = brand.bodyColor || '#4a5568';
+                    el.style.fontFamily = brand.bodyFont || "'Lora', Georgia, serif";
+                    el.style.fontSize = (brand.bodySize || 16) + 'px';
+                    el.style.lineHeight = brand.lineHeight || 1.8;
+                });
+
+                // Apply author styles
+                document.querySelectorAll('.article-content em').forEach(el => {
+                    el.style.color = brand.authorColor || '#2c3e50';
+                });
+
+                // Store brand for PDF/DOCX export
+                window.currentBrand = brand;
+            }
+
+            // Apply logo
+            if (savedLogo) {
+                const logoContainer = document.getElementById('logo-container');
+                const logoImg = document.getElementById('brand-logo');
+                if (logoContainer && logoImg) {
+                    logoImg.src = savedLogo;
+                    logoContainer.style.display = 'block';
+                }
+                window.currentLogo = savedLogo;
+            }
+        })();
+
+        // Save to history on page load
+        (function saveToHistory() {
+            const digestData = {
+                headline: `{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') }}`,
+                article_summaries: [
+                    {% for article in digest.article_summaries %}
+                    {
+                        title: `{{ article.title | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') }}`,
+                        author: `{{ article.author | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') }}`,
+                        summary: `{{ article.summary | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') }}`,
+                        url: `{{ article.url }}`
+                    }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            };
+
+            const historyItem = {
+                timestamp: new Date().toISOString(),
+                headline: digestData.headline,
+                url: `{{ url }}`,
+                articleCount: {{ count }},
+                digestData: digestData,
+                formatted: `{{ formatted | replace('\n', '\\n') | replace("'", "\\'") | safe }}`
+            };
+
+            // Get existing history
+            const history = JSON.parse(localStorage.getItem('digestHistory') || '[]');
+
+            // Check if this exact digest is already saved (avoid duplicates on refresh)
+            const isDuplicate = history.some(item =>
+                item.headline === historyItem.headline &&
+                item.url === historyItem.url &&
+                Math.abs(new Date(item.timestamp) - new Date(historyItem.timestamp)) < 60000
+            );
+
+            if (!isDuplicate) {
+                // Add to beginning of array
+                history.unshift(historyItem);
+
+                // Keep only last 20 items
+                if (history.length > 20) {
+                    history.pop();
+                }
+
+                localStorage.setItem('digestHistory', JSON.stringify(history));
+            }
+        })();
     </script>
 </body>
 </html>

@@ -18,6 +18,18 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/history-view")
+def history_view():
+    """Render the history view page (data comes from localStorage via JS)."""
+    return render_template("history_view.html")
+
+
+@app.route("/branding")
+def branding():
+    """Render the branding customization page."""
+    return render_template("branding.html")
+
+
 @app.route("/generate", methods=["POST"])
 def generate():
     """Generate a digest from the submitted URL."""

@@ -79,6 +79,69 @@ class ArticleScraper:
         text = element.get_text(separator=" ", strip=True)
         return " ".join(text.split())
 
+    def _clean_author_name(self, author: str) -> str:
+        """Clean author name by removing common extraneous text like 'About', 'Follow', etc."""
+        if not author:
+            return ""
+
+        # Remove common prefixes
+        author = author.replace("By ", "").replace("by ", "")
+        author = author.replace("Written by ", "").replace("written by ", "")
+        author = author.replace("Author: ", "").replace("author: ", "")
+
+        # Common words/phrases to remove (case-insensitive patterns)
+        remove_patterns = [
+            "About the Author",
+            "About the Authors",
+            "About",
+            "Follow on Twitter",
+            "Follow on X",
+            "Follow",
+            "Subscribe",
+            "Share",
+            "Twitter",
+            "Facebook",
+            "LinkedIn",
+            "Email",
+            "More articles",
+            "View all posts",
+            "Read more",
+            "Contact",
+            " | ",
+            " - ",
+        ]
+
+        # Sort by length descending to remove longer patterns first
+        remove_patterns.sort(key=len, reverse=True)
+
+        for pattern in remove_patterns:
+            # Case-insensitive replacement
+            lower_author = author.lower()
+            lower_pattern = pattern.lower()
+            while lower_pattern in lower_author:
+                idx = lower_author.find(lower_pattern)
+                author = author[:idx] + author[idx + len(pattern):]
+                lower_author = author.lower()
+
+        # Clean up multiple spaces and trim
+        author = " ".join(author.split()).strip()
+
+        # If author contains multiple names separated by commas or 'and', that's fine
+        # But if it's too long (likely contains extra junk), try to extract just the name part
+        if len(author) > 60:
+            # Try to get just the first part before any obvious separator
+            for sep in [",", " and ", " & ", "."]:
+                if sep in author:
+                    parts = author.split(sep)
+                    if parts[0].strip() and len(parts[0].strip()) < 50:
+                        author = parts[0].strip()
+                        break
+
+        # Remove any trailing/leading punctuation
+        author = author.strip(".,;:-|/\\\"'")
+
+        return author.strip()
+
     def _is_article_url(self, url: str) -> bool:
         """Check if a URL looks like an article (not a tag, category, or utility page)."""
         skip_patterns = [
@@ -165,6 +228,36 @@ class ArticleScraper:
                         full_url not in links):
                         links.append(full_url)
 
+        # Strategy 4: Look for any links with article-like patterns in the entire page
+        # This helps with blog subpages like /blog that may have different structures
+        if not links:
+            for link in soup.find_all("a", href=True):
+                href = link.get("href", "")
+                full_url = urljoin(self.base_url, href)
+                parsed_url = urlparse(full_url)
+
+                # Must be on same domain
+                if base_domain not in parsed_url.netloc:
+                    continue
+
+                # Skip if not article-like
+                if not self._is_article_url(full_url):
+                    continue
+
+                # Look for URLs that have date patterns or /blog/ prefix with slug
+                path = parsed_url.path.lower()
+                path_parts = [p for p in path.split("/") if p]
+
+                # Skip if it's just the blog index
+                if path_parts == ["blog"] or path_parts == ["articles"] or path_parts == ["posts"]:
+                    continue
+
+                # Accept URLs like /blog/article-slug or /2024/01/article-slug
+                if len(path_parts) >= 2:
+                    # Has multiple path segments (likely an article)
+                    if full_url not in links:
+                        links.append(full_url)
+
         return links
 
     def _scrape_article_page(self, url: str) -> Optional[Article]:
@@ -207,7 +300,7 @@ class ArticleScraper:
                 author_elem = soup.select_one(selector)
                 if author_elem:
                     author = self._extract_text(author_elem)
-                    author = author.replace("By ", "").replace("by ", "").strip()
+                    author = self._clean_author_name(author)
                     if author and len(author) < 100:
                         break
 

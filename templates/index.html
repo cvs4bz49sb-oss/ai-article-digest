@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Article Digest Generator</title>
+    <title>Well Done Digest Generator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -217,13 +217,181 @@
         footer a:hover {
             color: white;
         }
+
+        .secondary-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .btn-history {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-history:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+        }
+
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .history-modal.active {
+            display: flex;
+        }
+
+        .history-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid rgba(93, 122, 140, 0.15);
+        }
+
+        .history-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #5d7a8c;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #2c3e50;
+        }
+
+        .history-list {
+            overflow-y: auto;
+            padding: 16px 24px;
+        }
+
+        .history-item {
+            padding: 16px;
+            border: 1px solid rgba(93, 122, 140, 0.15);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(93, 122, 140, 0.05);
+            border-color: rgba(93, 122, 140, 0.3);
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-item-date {
+            font-size: 12px;
+            color: #5d7a8c;
+            margin-bottom: 8px;
+        }
+
+        .history-item-headline {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .history-item-meta {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .history-action-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .history-action-btn.view {
+            background: #5d7a8c;
+            color: white;
+        }
+
+        .history-action-btn.view:hover {
+            background: #4d6a7c;
+        }
+
+        .history-action-btn.delete {
+            background: transparent;
+            color: #dc5050;
+            border: 1px solid rgba(220, 80, 80, 0.3);
+        }
+
+        .history-action-btn.delete:hover {
+            background: rgba(220, 80, 80, 0.1);
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
 
     <div class="container">
-        <h1>Article Digest</h1>
+        <h1>Well Done Digest</h1>
         <p class="subtitle">Transform any blog into an intellectually rigorous digest</p>
 
         {% if error %}
@@ -244,6 +412,35 @@
 
             <button type="submit" id="submit-btn">Generate Digest</button>
         </form>
+
+        <div class="secondary-actions">
+            <button class="btn-history" id="history-btn" onclick="showHistory()" style="display: none;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 3.5V8L11 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                View History
+            </button>
+
+            <a href="/branding" class="btn-history">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.5 2.5L13.5 3.5L5 12L2 13L3 10L12.5 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Branding
+            </a>
+        </div>
+
+        <div class="history-modal" id="history-modal">
+            <div class="history-content">
+                <div class="history-header">
+                    <h2>Digest History</h2>
+                    <button class="close-btn" onclick="closeHistory()">&times;</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be inserted here -->
+                </div>
+            </div>
+        </div>
 
         <div class="loading" id="loading">
             <div class="loading-dots">
@@ -276,8 +473,85 @@
         document.getElementById('digest-form').addEventListener('submit', function() {
             document.getElementById('submit-btn').disabled = true;
             document.getElementById('digest-form').style.display = 'none';
+            document.getElementById('history-btn').style.display = 'none';
             document.getElementById('loading').classList.add('active');
         });
+
+        // History functions
+        function getHistory() {
+            const history = localStorage.getItem('digestHistory');
+            return history ? JSON.parse(history) : [];
+        }
+
+        function checkHistory() {
+            const history = getHistory();
+            const historyBtn = document.getElementById('history-btn');
+            if (history.length > 0) {
+                historyBtn.style.display = 'inline-flex';
+            }
+        }
+
+        function showHistory() {
+            const modal = document.getElementById('history-modal');
+            const list = document.getElementById('history-list');
+            const history = getHistory();
+
+            if (history.length === 0) {
+                list.innerHTML = '<div class="history-empty">No previous digests found.</div>';
+            } else {
+                list.innerHTML = history.map((item, index) => `
+                    <div class="history-item">
+                        <div class="history-item-date">${new Date(item.timestamp).toLocaleString()}</div>
+                        <div class="history-item-headline">${escapeHtml(item.headline)}</div>
+                        <div class="history-item-meta">${item.articleCount} articles from ${escapeHtml(item.url)}</div>
+                        <div class="history-actions">
+                            <button class="history-action-btn view" onclick="viewHistoryItem(${index})">View</button>
+                            <button class="history-action-btn delete" onclick="deleteHistoryItem(${index}); event.stopPropagation();">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeHistory() {
+            document.getElementById('history-modal').classList.remove('active');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function viewHistoryItem(index) {
+            const history = getHistory();
+            const item = history[index];
+            if (item && item.digestData) {
+                // Store the selected item for the result page
+                sessionStorage.setItem('viewingHistoryItem', JSON.stringify(item));
+                window.location.href = '/history-view';
+            }
+        }
+
+        function deleteHistoryItem(index) {
+            const history = getHistory();
+            history.splice(index, 1);
+            localStorage.setItem('digestHistory', JSON.stringify(history));
+            showHistory(); // Refresh the list
+            checkHistory(); // Update button visibility
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('history-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistory();
+            }
+        });
+
+        // Check for history on page load
+        checkHistory();
     </script>
 </body>
 </html>
