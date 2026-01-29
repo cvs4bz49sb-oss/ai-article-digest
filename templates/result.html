@@ -806,34 +806,38 @@
 
         function copyAsHTML() {
             // Generate HTML that preserves formatting when pasted into HubSpot
+            // Using simpler HTML structure that HubSpot handles better
             const brand = window.currentBrand || {};
             const headlineColor = brand.headlineColor || '#c9785d';
             const sectionColor = brand.sectionColor || '#5d7a8c';
             const titleColor = brand.titleColor || '#c9785d';
             const bodyColor = brand.bodyColor || '#4a5568';
             const authorColor = brand.authorColor || '#2c3e50';
-            const headlineSize = brand.headlineSize || 28;
-            const titleSize = brand.titleSize || 18;
-            const bodySize = brand.bodySize || 16;
-            const lineHeight = brand.lineHeight || 1.8;
 
-            let html = `<h1 style="font-family: Georgia, serif; font-size: ${headlineSize}px; text-align: center; margin-bottom: 20px; color: ${headlineColor}; font-weight: 500;">{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}</h1>`;
+            let html = '';
+
+            // Headline - centered, colored
+            html += `<p style="text-align: center; margin-bottom: 20px;"><span style="font-size: 28px; color: ${headlineColor}; font-weight: bold;">{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') }}</span></p>`;
 
             {% if digest.combined_summary %}
-            html += `<p style="font-family: Georgia, serif; font-size: 16px; text-align: center; margin-bottom: 40px; color: ${bodyColor}; line-height: 1.7;">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            // Combined summary - centered, smaller
+            html += `<p style="text-align: center; margin-bottom: 40px; color: ${bodyColor}; font-size: 16px; line-height: 1.7;">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% endif %}
 
-            html += `<h2 style="font-family: sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: ${sectionColor}; text-align: center; margin-bottom: 30px; font-weight: 500;">Articles</h2>`;
+            // Articles header
+            html += `<p style="text-align: center; margin-bottom: 30px;"><span style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: ${sectionColor}; font-weight: bold;">ARTICLES</span></p>`;
 
             {% for article in digest.article_summaries %}
-            html += `<div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;">`;
-            html += `<p style="font-family: Georgia, serif; font-size: ${titleSize}px; font-weight: 500; margin-bottom: 12px;"><span style="color: ${sectionColor}; font-family: sans-serif; font-size: 13px; margin-right: 8px;">{{ loop.index }}.</span><a href="{{ article.url }}" style="color: ${titleColor}; text-decoration: none;">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</a></p>`;
+            // Article title with number
+            html += `<p style="margin-bottom: 12px;"><span style="color: ${sectionColor}; font-size: 13px;">{{ loop.index }}.</span> <a href="{{ article.url }}" style="color: ${titleColor}; text-decoration: none; font-size: 18px; font-weight: bold;">{{ article.title | replace("'", "\\'") | replace('"', '\\"') }}</a></p>`;
             {% if article.author and article.author != 'Unknown Author' %}
-            html += `<p style="font-family: Georgia, serif; color: ${bodyColor}; line-height: ${lineHeight}; font-size: ${bodySize}px;"><em style="color: ${authorColor};">{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            html += `<p style="color: ${bodyColor}; line-height: 1.8; font-size: 16px; margin-bottom: 30px;"><em style="color: ${authorColor};">{{ article.author | replace("'", "\\'") }}</em> {{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% else %}
-            html += `<p style="font-family: Georgia, serif; color: ${bodyColor}; line-height: ${lineHeight}; font-size: ${bodySize}px;">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
+            html += `<p style="color: ${bodyColor}; line-height: 1.8; font-size: 16px; margin-bottom: 30px;">{{ article.summary | replace("'", "\\'") | replace('"', '\\"') }}</p>`;
             {% endif %}
-            html += `</div>`;
+            {% if not loop.last %}
+            html += `<hr style="border: none; border-top: 1px solid #eeeeee; margin-bottom: 30px;">`;
+            {% endif %}
             {% endfor %}
 
             // Use the Clipboard API with HTML mime type
