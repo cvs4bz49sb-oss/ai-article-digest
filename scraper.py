@@ -317,15 +317,29 @@ class ArticleScraper:
                 author = "Unknown Author"
 
             # Extract content - try multiple approaches
+            # Order matters: more specific selectors first, then generic ones
             content = ""
             content_selectors = [
+                # Webflow-specific (used by sites like Unchained)
+                ".blog-content__copy",
+                ".w-richtext",
+                # Common blog platforms
                 ".entry-content",
                 ".post-content",
                 ".article-content",
                 ".post-body",
+                ".blog-post-content",
+                ".article-body",
+                ".story-content",
+                ".post__content",
+                ".content-body",
+                # Generic patterns
                 "article .content",
-                "[class*='content']",
-                "article"
+                "[class*='post-content']",
+                "[class*='article-content']",
+                "[class*='entry-content']",
+                "[class*='blog-content']",
+                "article",
             ]
 
             for selector in content_selectors:
