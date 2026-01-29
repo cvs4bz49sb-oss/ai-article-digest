@@ -223,10 +223,414 @@
                 text-align: center;
             }
         }
+
+        /* Branding Panel Styles */
+        .branding-toggle {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 10px 0 0 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 50;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #5d7a8c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .branding-toggle:hover {
+            background: white;
+            color: #3d5a6c;
+        }
+
+        .branding-panel {
+            position: fixed;
+            right: -360px;
+            top: 0;
+            width: 360px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+            z-index: 100;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .branding-panel.open {
+            right: 0;
+        }
+
+        .branding-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(93, 122, 140, 0.15);
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .branding-panel-header h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .branding-panel-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #5d7a8c;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .branding-panel-content {
+            padding: 20px 24px;
+        }
+
+        .branding-section {
+            margin-bottom: 24px;
+        }
+
+        .branding-section h4 {
+            color: #5d7a8c;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .branding-field {
+            margin-bottom: 16px;
+        }
+
+        .branding-field label {
+            display: block;
+            color: #4a5568;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .branding-field input[type="text"],
+        .branding-field select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(93, 122, 140, 0.25);
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #2c3e50;
+        }
+
+        .branding-field input[type="text"]:focus,
+        .branding-field select:focus {
+            outline: none;
+            border-color: #5d7a8c;
+        }
+
+        .color-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-row input[type="text"] {
+            flex: 1;
+        }
+
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid rgba(93, 122, 140, 0.25);
+            cursor: pointer;
+        }
+
+        .color-swatch input[type="color"] {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(93, 122, 140, 0.2);
+            -webkit-appearance: none;
+        }
+
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #5d7a8c;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            color: #5d7a8c;
+            font-size: 12px;
+        }
+
+        .logo-upload-mini {
+            border: 2px dashed rgba(93, 122, 140, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logo-upload-mini:hover {
+            border-color: #5d7a8c;
+            background: rgba(93, 122, 140, 0.05);
+        }
+
+        .logo-upload-mini.has-logo {
+            border-style: solid;
+        }
+
+        .logo-upload-mini img {
+            max-width: 120px;
+            max-height: 50px;
+            margin-bottom: 8px;
+        }
+
+        .logo-upload-mini p {
+            color: #5d7a8c;
+            font-size: 11px;
+            margin: 0;
+        }
+
+        .logo-upload-mini input[type="file"] {
+            display: none;
+        }
+
+        .remove-logo-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            background: rgba(220, 80, 80, 0.1);
+            color: #dc5050;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .branding-panel-actions {
+            padding: 16px 24px;
+            border-top: 1px solid rgba(93, 122, 140, 0.15);
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .branding-panel-actions .btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        .save-indicator {
+            display: none;
+            color: #48bb78;
+            font-size: 12px;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .save-indicator.show {
+            display: block;
+        }
+
+        .branding-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 99;
+        }
+
+        .branding-overlay.open {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
+
+    <!-- Branding Toggle Button -->
+    <button class="branding-toggle" onclick="toggleBrandingPanel()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.5 2.5L13.5 3.5L5 12L2 13L3 10L12.5 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Customize
+    </button>
+
+    <!-- Branding Panel Overlay -->
+    <div class="branding-overlay" id="branding-overlay" onclick="toggleBrandingPanel()"></div>
+
+    <!-- Branding Panel -->
+    <div class="branding-panel" id="branding-panel">
+        <div class="branding-panel-header">
+            <h3>Customize Branding</h3>
+            <button class="branding-panel-close" onclick="toggleBrandingPanel()">&times;</button>
+        </div>
+
+        <div class="branding-panel-content">
+            <div class="branding-section">
+                <h4>Logo</h4>
+                <div class="logo-upload-mini" id="logo-upload-mini" onclick="document.getElementById('panel-logo-input').click()">
+                    <div id="panel-logo-preview">
+                        <p>Click to upload</p>
+                    </div>
+                    <input type="file" id="panel-logo-input" accept="image/*" onchange="handlePanelLogoUpload(event)">
+                </div>
+            </div>
+
+            <div class="branding-section">
+                <h4>Colors</h4>
+                <div class="branding-field">
+                    <label>Headline</label>
+                    <div class="color-row">
+                        <input type="text" id="panel-headline-color" value="#2c3e50" oninput="applyLiveBrand()">
+                        <div class="color-swatch" style="background: #2c3e50" id="panel-headline-swatch" onclick="document.getElementById('panel-headline-picker').click()">
+                            <input type="color" id="panel-headline-picker" value="#2c3e50" onchange="syncPanelColor('panel-headline-color', this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Section Title</label>
+                    <div class="color-row">
+                        <input type="text" id="panel-section-color" value="#5d7a8c" oninput="applyLiveBrand()">
+                        <div class="color-swatch" style="background: #5d7a8c" id="panel-section-swatch" onclick="document.getElementById('panel-section-picker').click()">
+                            <input type="color" id="panel-section-picker" value="#5d7a8c" onchange="syncPanelColor('panel-section-color', this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Article Title</label>
+                    <div class="color-row">
+                        <input type="text" id="panel-title-color" value="#2c3e50" oninput="applyLiveBrand()">
+                        <div class="color-swatch" style="background: #2c3e50" id="panel-title-swatch" onclick="document.getElementById('panel-title-picker').click()">
+                            <input type="color" id="panel-title-picker" value="#2c3e50" onchange="syncPanelColor('panel-title-color', this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Body Text</label>
+                    <div class="color-row">
+                        <input type="text" id="panel-body-color" value="#4a5568" oninput="applyLiveBrand()">
+                        <div class="color-swatch" style="background: #4a5568" id="panel-body-swatch" onclick="document.getElementById('panel-body-picker').click()">
+                            <input type="color" id="panel-body-picker" value="#4a5568" onchange="syncPanelColor('panel-body-color', this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Author</label>
+                    <div class="color-row">
+                        <input type="text" id="panel-author-color" value="#2c3e50" oninput="applyLiveBrand()">
+                        <div class="color-swatch" style="background: #2c3e50" id="panel-author-swatch" onclick="document.getElementById('panel-author-picker').click()">
+                            <input type="color" id="panel-author-picker" value="#2c3e50" onchange="syncPanelColor('panel-author-color', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="branding-section">
+                <h4>Typography</h4>
+                <div class="branding-field">
+                    <label>Headline Font</label>
+                    <select id="panel-headline-font" onchange="applyLiveBrand()">
+                        <option value="'Lora', Georgia, serif">Lora</option>
+                        <option value="'Playfair Display', Georgia, serif">Playfair Display</option>
+                        <option value="'Merriweather', Georgia, serif">Merriweather</option>
+                        <option value="'Source Serif Pro', Georgia, serif">Source Serif Pro</option>
+                        <option value="'Crimson Text', Georgia, serif">Crimson Text</option>
+                        <option value="'Libre Baskerville', Georgia, serif">Libre Baskerville</option>
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="Georgia, serif">Georgia</option>
+                    </select>
+                </div>
+                <div class="branding-field">
+                    <label>Body Font</label>
+                    <select id="panel-body-font" onchange="applyLiveBrand()">
+                        <option value="'Lora', Georgia, serif">Lora</option>
+                        <option value="'Merriweather', Georgia, serif">Merriweather</option>
+                        <option value="'Source Serif Pro', Georgia, serif">Source Serif Pro</option>
+                        <option value="'Crimson Text', Georgia, serif">Crimson Text</option>
+                        <option value="'Libre Baskerville', Georgia, serif">Libre Baskerville</option>
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="Georgia, serif">Georgia</option>
+                    </select>
+                </div>
+                <div class="branding-field">
+                    <label>Headline Size</label>
+                    <div class="slider-row">
+                        <input type="range" id="panel-headline-size" min="20" max="48" value="32" oninput="applyLiveBrand()">
+                        <span class="slider-value" id="panel-headline-size-val">32px</span>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Title Size</label>
+                    <div class="slider-row">
+                        <input type="range" id="panel-title-size" min="14" max="28" value="20" oninput="applyLiveBrand()">
+                        <span class="slider-value" id="panel-title-size-val">20px</span>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Body Size</label>
+                    <div class="slider-row">
+                        <input type="range" id="panel-body-size" min="12" max="20" value="16" oninput="applyLiveBrand()">
+                        <span class="slider-value" id="panel-body-size-val">16px</span>
+                    </div>
+                </div>
+                <div class="branding-field">
+                    <label>Line Spacing</label>
+                    <div class="slider-row">
+                        <input type="range" id="panel-line-height" min="1.2" max="2.4" step="0.1" value="1.8" oninput="applyLiveBrand()">
+                        <span class="slider-value" id="panel-line-height-val">1.8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="save-indicator" id="save-indicator">Saved!</div>
+
+        <div class="branding-panel-actions">
+            <button class="btn btn-primary" onclick="savePanelBrand()">Save Brand</button>
+            <button class="btn btn-secondary" onclick="resetPanelBrand()">Reset</button>
+        </div>
+    </div>
 
     <div class="container">
         <a href="/" class="back-link">
@@ -523,6 +927,204 @@
                 }
 
                 localStorage.setItem('digestHistory', JSON.stringify(history));
+            }
+        })();
+
+        // Branding Panel Functions
+        function toggleBrandingPanel() {
+            document.getElementById('branding-panel').classList.toggle('open');
+            document.getElementById('branding-overlay').classList.toggle('open');
+        }
+
+        function syncPanelColor(inputId, value) {
+            document.getElementById(inputId).value = value;
+            const swatchId = inputId.replace('-color', '-swatch');
+            document.getElementById(swatchId).style.background = value;
+            applyLiveBrand();
+        }
+
+        function getPanelBrand() {
+            return {
+                headlineColor: document.getElementById('panel-headline-color').value,
+                sectionColor: document.getElementById('panel-section-color').value,
+                titleColor: document.getElementById('panel-title-color').value,
+                bodyColor: document.getElementById('panel-body-color').value,
+                authorColor: document.getElementById('panel-author-color').value,
+                headlineFont: document.getElementById('panel-headline-font').value,
+                bodyFont: document.getElementById('panel-body-font').value,
+                headlineSize: parseInt(document.getElementById('panel-headline-size').value),
+                titleSize: parseInt(document.getElementById('panel-title-size').value),
+                bodySize: parseInt(document.getElementById('panel-body-size').value),
+                lineHeight: parseFloat(document.getElementById('panel-line-height').value)
+            };
+        }
+
+        function applyLiveBrand() {
+            const brand = getPanelBrand();
+
+            // Update slider value displays
+            document.getElementById('panel-headline-size-val').textContent = brand.headlineSize + 'px';
+            document.getElementById('panel-title-size-val').textContent = brand.titleSize + 'px';
+            document.getElementById('panel-body-size-val').textContent = brand.bodySize + 'px';
+            document.getElementById('panel-line-height-val').textContent = brand.lineHeight;
+
+            // Update color swatches
+            document.getElementById('panel-headline-swatch').style.background = brand.headlineColor;
+            document.getElementById('panel-section-swatch').style.background = brand.sectionColor;
+            document.getElementById('panel-title-swatch').style.background = brand.titleColor;
+            document.getElementById('panel-body-swatch').style.background = brand.bodyColor;
+            document.getElementById('panel-author-swatch').style.background = brand.authorColor;
+
+            // Apply to digest
+            const headline = document.getElementById('headline');
+            if (headline) {
+                headline.style.color = brand.headlineColor;
+                headline.style.fontFamily = brand.headlineFont;
+                headline.style.fontSize = brand.headlineSize + 'px';
+            }
+
+            const sectionTitle = document.getElementById('section-title');
+            if (sectionTitle) {
+                sectionTitle.style.color = brand.sectionColor;
+            }
+
+            document.querySelectorAll('.article-number').forEach(el => {
+                el.style.color = brand.sectionColor;
+            });
+
+            document.querySelectorAll('.article-title').forEach(el => {
+                el.style.fontSize = brand.titleSize + 'px';
+            });
+
+            document.querySelectorAll('.article-title a').forEach(el => {
+                el.style.color = brand.titleColor;
+            });
+
+            document.querySelectorAll('.article-content').forEach(el => {
+                el.style.color = brand.bodyColor;
+                el.style.fontFamily = brand.bodyFont;
+                el.style.fontSize = brand.bodySize + 'px';
+                el.style.lineHeight = brand.lineHeight;
+            });
+
+            document.querySelectorAll('.article-content em').forEach(el => {
+                el.style.color = brand.authorColor;
+            });
+
+            // Store for PDF/DOCX export
+            window.currentBrand = brand;
+        }
+
+        function savePanelBrand() {
+            const brand = getPanelBrand();
+            localStorage.setItem('digestBrand', JSON.stringify(brand));
+
+            document.getElementById('save-indicator').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('save-indicator').classList.remove('show');
+            }, 2000);
+        }
+
+        function resetPanelBrand() {
+            // Reset to defaults
+            document.getElementById('panel-headline-color').value = '#2c3e50';
+            document.getElementById('panel-section-color').value = '#5d7a8c';
+            document.getElementById('panel-title-color').value = '#2c3e50';
+            document.getElementById('panel-body-color').value = '#4a5568';
+            document.getElementById('panel-author-color').value = '#2c3e50';
+            document.getElementById('panel-headline-font').value = "'Lora', Georgia, serif";
+            document.getElementById('panel-body-font').value = "'Lora', Georgia, serif";
+            document.getElementById('panel-headline-size').value = 32;
+            document.getElementById('panel-title-size').value = 20;
+            document.getElementById('panel-body-size').value = 16;
+            document.getElementById('panel-line-height').value = 1.8;
+
+            applyLiveBrand();
+        }
+
+        function handlePanelLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    localStorage.setItem('digestBrandLogo', dataUrl);
+                    showPanelLogoPreview(dataUrl);
+
+                    // Also update the main page logo
+                    const logoContainer = document.getElementById('logo-container');
+                    const logoImg = document.getElementById('brand-logo');
+                    if (logoContainer && logoImg) {
+                        logoImg.src = dataUrl;
+                        logoContainer.style.display = 'block';
+                    }
+                    window.currentLogo = dataUrl;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function showPanelLogoPreview(dataUrl) {
+            const container = document.getElementById('panel-logo-preview');
+            const uploadDiv = document.getElementById('logo-upload-mini');
+            uploadDiv.classList.add('has-logo');
+            container.innerHTML = `
+                <img src="${dataUrl}" alt="Logo">
+                <br>
+                <button class="remove-logo-btn" onclick="removePanelLogo(event)">Remove</button>
+            `;
+        }
+
+        function removePanelLogo(event) {
+            event.stopPropagation();
+            localStorage.removeItem('digestBrandLogo');
+
+            const container = document.getElementById('panel-logo-preview');
+            const uploadDiv = document.getElementById('logo-upload-mini');
+            uploadDiv.classList.remove('has-logo');
+            container.innerHTML = '<p>Click to upload</p>';
+
+            // Hide main page logo
+            document.getElementById('logo-container').style.display = 'none';
+            document.getElementById('panel-logo-input').value = '';
+            window.currentLogo = null;
+        }
+
+        // Initialize branding panel with saved values
+        (function initBrandingPanel() {
+            const saved = localStorage.getItem('digestBrand');
+            const savedLogo = localStorage.getItem('digestBrandLogo');
+
+            if (saved) {
+                const brand = JSON.parse(saved);
+                document.getElementById('panel-headline-color').value = brand.headlineColor || '#2c3e50';
+                document.getElementById('panel-section-color').value = brand.sectionColor || '#5d7a8c';
+                document.getElementById('panel-title-color').value = brand.titleColor || '#2c3e50';
+                document.getElementById('panel-body-color').value = brand.bodyColor || '#4a5568';
+                document.getElementById('panel-author-color').value = brand.authorColor || '#2c3e50';
+                document.getElementById('panel-headline-font').value = brand.headlineFont || "'Lora', Georgia, serif";
+                document.getElementById('panel-body-font').value = brand.bodyFont || "'Lora', Georgia, serif";
+                document.getElementById('panel-headline-size').value = brand.headlineSize || 32;
+                document.getElementById('panel-title-size').value = brand.titleSize || 20;
+                document.getElementById('panel-body-size').value = brand.bodySize || 16;
+                document.getElementById('panel-line-height').value = brand.lineHeight || 1.8;
+
+                // Update displays
+                document.getElementById('panel-headline-size-val').textContent = (brand.headlineSize || 32) + 'px';
+                document.getElementById('panel-title-size-val').textContent = (brand.titleSize || 20) + 'px';
+                document.getElementById('panel-body-size-val').textContent = (brand.bodySize || 16) + 'px';
+                document.getElementById('panel-line-height-val').textContent = brand.lineHeight || 1.8;
+
+                // Update swatches
+                document.getElementById('panel-headline-swatch').style.background = brand.headlineColor || '#2c3e50';
+                document.getElementById('panel-section-swatch').style.background = brand.sectionColor || '#5d7a8c';
+                document.getElementById('panel-title-swatch').style.background = brand.titleColor || '#2c3e50';
+                document.getElementById('panel-body-swatch').style.background = brand.bodyColor || '#4a5568';
+                document.getElementById('panel-author-swatch').style.background = brand.authorColor || '#2c3e50';
+            }
+
+            if (savedLogo) {
+                showPanelLogoPreview(savedLogo);
             }
         })();
     </script>

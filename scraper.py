@@ -1,5 +1,6 @@
 """Web scraping module for extracting articles from websites."""
 
+import html
 import time
 from dataclasses import dataclass
 from typing import Optional
@@ -77,6 +78,8 @@ class ArticleScraper:
         for script in element(["script", "style", "nav", "footer", "header"]):
             script.decompose()
         text = element.get_text(separator=" ", strip=True)
+        # Decode HTML entities like &#39; -> ' and &amp; -> &
+        text = html.unescape(text)
         return " ".join(text.split())
 
     def _clean_author_name(self, author: str) -> str:
