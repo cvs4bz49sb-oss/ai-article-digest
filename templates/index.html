@@ -464,14 +464,14 @@
         <form action="/generate" method="POST" id="digest-form">
             <input type="hidden" id="mode" name="mode" value="recent">
 
-            <div class="form-group" id="url-group">
-                <label for="url">Website URL</label>
-                <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
-            </div>
-
             <div class="mode-toggle">
                 <button type="button" class="mode-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
                 <button type="button" class="mode-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
+            </div>
+
+            <div class="form-group" id="url-group">
+                <label for="url">Website URL</label>
+                <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
             </div>
 
             <div class="mode-content active" id="mode-recent">
