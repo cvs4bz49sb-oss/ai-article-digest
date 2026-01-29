@@ -31,30 +31,41 @@ Your summaries must embody these characteristics:
 - Emotional manipulation or clickbait
 - Oversimplification of complex arguments
 - Generic or interchangeable descriptions
-- Starting summaries with the author's name
-- Using phrases like "In this article..." or "The author..."
+- Using phrases like "In this article..." or "The article..."
 
 ## Summary Format
 
-Each summary must:
-- Be exactly 50 words or fewer
+CRITICAL: Each summary must follow this EXACT format:
+- Start with the author's name in a natural sentence
+- Use active verbs like "examines," "argues," "contends," "traces," "frames," "looks at"
+- The summary flows as a single paragraph starting with the author
+- Be exactly 50 words or fewer total
 - Present the article's core argument or insight
-- Use language that reflects intellectual seriousness
-- Be a single, well-crafted paragraph
 
-## Example Summaries (for style reference)
+## Example Summaries (FOLLOW THIS FORMAT EXACTLY)
 
-Good example:
-"The administrative state's expansion represents not merely bureaucratic growth but a fundamental reordering of constitutional authority. When agencies both make and enforce rules, the separation of powers becomes merely theoretical, leaving citizens subject to a governance structure the Founders explicitly rejected."
+Example 1:
+"Marc Sims examines theological principles guiding church architecture, arguing that while church health doesn't depend on building quality, sacred spaces can aid worship by drawing attention heavenward through intentional, non-distracting design that emphasizes God's transcendence."
 
-Good example:
-"Contemporary debates about religious liberty often miss the deeper question: not whether faith should be accommodated, but whether a society that treats transcendent commitments as private preferences can sustain the moral vocabulary necessary for genuine pluralism."
+Example 2:
+"Shebuel Varghesee frames the controversial hymn through a third-culture perspective, arguing that for diaspora Christians, the longing for heavenly home reflects genuine existential displacement rather than escapism, offering spiritual comfort to the globally dispersed."
 
-Bad example (too vague):
+Example 3:
+"Michael Horton traces Joachim of Fiore's influence on Western thought, showing how medieval eschatology fused vertical spiritual ascent with historical progress, profoundly shaping utopian ideologies and modern definitions of advancement through science and reason."
+
+Example 4:
+"Joshua Heavin examines J.C. Ryle's practical holiness emphasis, emphasizing his pastoral approach to suffering, faithfulness to Anglican formularies, preaching clarity, and pastoral care for the dying—offering resources for contemporary Christian witness and formation."
+
+Example 5:
+"John Ehrett looks at evangelical fractures as fundamentally a class conflict between credential-holding elites and working-class congregants, arguing this economic and cultural divide—not theological disagreement—drives much contemporary polarization within American Christianity."
+
+BAD example (doesn't start with author):
+"The administrative state's expansion represents not merely bureaucratic growth but a fundamental reordering of constitutional authority."
+
+BAD example (too vague):
 "This article discusses religious liberty and its importance in modern society. The author explores various perspectives on the topic."
 
-Bad example (too promotional):
-"A must-read piece that will change how you think about democracy! The author brilliantly shows why we need to pay attention to this crucial issue."""
+Remember: EVERY summary must begin with the author's name followed by an active verb."""
 
 
 def create_summary_prompt(articles: list[Article]) -> str:
@@ -79,33 +90,30 @@ Content:
 
 Please provide:
 
-1. **HEADLINE**: Create a compelling, intellectually engaging headline that references the most interesting 1-2 articles. The headline should be optimized for email open rates while maintaining intellectual credibility. Do not use clickbait - instead, hint at substantive ideas.
+1. **HEADLINE**: Create a compelling, intellectually engaging headline for the digest. Reference the most interesting 1-2 articles. Format: "This Week At Mere Orthodoxy" style - elegant and understated.
 
-2. **COMBINED SUMMARY**: Write a single sentence (20-30 words) that weaves together the themes from all articles, giving readers a sense of the digest's intellectual range.
-
-3. **INDIVIDUAL SUMMARIES**: For each article, provide:
+2. **INDIVIDUAL SUMMARIES**: For each article, provide:
    - The article title (exactly as given)
    - The author name (exactly as given)
-   - A summary of exactly 50 words or fewer that captures the article's central argument
+   - A summary that STARTS WITH THE AUTHOR'S NAME followed by an active verb (examines, argues, traces, frames, looks at, contends, etc.)
+   - Maximum 50 words per summary
 
 Format your response EXACTLY as follows (this format will be parsed programmatically):
 
 HEADLINE: [Your headline here]
 
-COMBINED_SUMMARY: [Your one-sentence combined summary here]
-
 ARTICLE_SUMMARIES:
 1. TITLE: [Article 1 title]
 AUTHOR: [Article 1 author]
-SUMMARY: [50-word max summary]
+SUMMARY: [Author name] [active verb] [rest of 50-word max summary]
 
 2. TITLE: [Article 2 title]
 AUTHOR: [Article 2 author]
-SUMMARY: [50-word max summary]
+SUMMARY: [Author name] [active verb] [rest of 50-word max summary]
 
 [Continue for all articles...]
 
-Remember: Each summary must be 50 words or fewer, intellectually substantive, and focused on arguments rather than topics."""
+CRITICAL REMINDER: Each summary MUST start with the author's name (e.g., "Marc Sims examines...", "John Smith argues...", "Jane Doe traces..."). This is non-negotiable."""
 
 
 class DigestGenerator:
@@ -198,10 +206,6 @@ class DigestGenerator:
         # Headline
         output.append(digest["headline"])
         output.append("")
-
-        # Combined summary
-        output.append(digest["combined_summary"])
-        output.append("")
         output.append("Articles")
         output.append("")
 
@@ -217,8 +221,8 @@ class DigestGenerator:
                 summary = " ".join(words[:MAX_SUMMARY_WORDS]) + "..."
 
             output.append(f"{i}. **{title}**")
-            output.append(f"*{author}*")
-            output.append(summary)
+            output.append(f"")
+            output.append(f"*{author}* {summary}")
             output.append("")
 
         return "\n".join(output)

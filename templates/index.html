@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Article Digest Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -12,8 +15,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #5d7a8c 0%, #8a9ea8 50%, #a8b5bc 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,156 +25,205 @@
         }
 
         .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 48px;
-            max-width: 600px;
+            max-width: 480px;
             width: 100%;
+            text-align: center;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         h1 {
-            color: #1a1a2e;
+            color: white;
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 300;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
-            text-align: center;
         }
 
         .subtitle {
-            color: #64748b;
-            text-align: center;
-            margin-bottom: 32px;
-            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            font-weight: 300;
+            margin-bottom: 48px;
+            letter-spacing: 0.3px;
         }
 
         .form-group {
             margin-bottom: 24px;
+            text-align: left;
         }
 
         label {
             display: block;
-            color: #374151;
-            font-weight: 600;
-            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            margin-bottom: 10px;
             font-size: 14px;
+            letter-spacing: 0.3px;
         }
 
         input[type="text"],
         input[type="number"] {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         input[type="number"] {
-            width: 120px;
+            width: 100px;
         }
 
         button {
             width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             color: white;
-            border: none;
-            border-radius: 10px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 400;
+            font-family: inherit;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            letter-spacing: 0.3px;
+            margin-top: 16px;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
-        }
-
-        button:active {
-            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         button:disabled {
-            background: #9ca3af;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
         .error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 14px 16px;
-            border-radius: 10px;
+            background: rgba(220, 80, 80, 0.2);
+            border: 1px solid rgba(220, 80, 80, 0.4);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
             margin-bottom: 24px;
             font-size: 14px;
+            backdrop-filter: blur(10px);
         }
 
         .loading {
             display: none;
-            text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .loading.active {
             display: block;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e5e7eb;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: 0s; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        .loading-dot:nth-child(4) { animation-delay: 0.6s; }
+        .loading-dot:nth-child(5) { animation-delay: 0.8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-10px); opacity: 1; }
         }
 
         .loading-text {
-            color: #64748b;
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            font-weight: 300;
+            letter-spacing: 0.3px;
         }
 
         .help-text {
-            color: #9ca3af;
-            font-size: 13px;
-            margin-top: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-top: 8px;
         }
 
         footer {
+            position: fixed;
+            bottom: 24px;
+            left: 0;
+            right: 0;
             text-align: center;
-            margin-top: 32px;
-            color: #9ca3af;
-            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
         }
 
         footer a {
-            color: #3b82f6;
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
         }
 
         footer a:hover {
-            text-decoration: underline;
+            color: white;
         }
     </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+
     <div class="container">
-        <h1>AI Article Digest Generator</h1>
+        <h1>Article Digest</h1>
         <p class="subtitle">Transform any blog into an intellectually rigorous digest</p>
 
         {% if error %}
@@ -182,33 +234,48 @@
             <div class="form-group">
                 <label for="url">Website URL</label>
                 <input type="text" id="url" name="url" placeholder="https://example-blog.com" required>
-                <p class="help-text">Enter the URL of a blog or news site to scrape articles from</p>
             </div>
 
             <div class="form-group">
                 <label for="count">Number of Articles</label>
                 <input type="number" id="count" name="count" value="10" min="1" max="20">
-                <p class="help-text">How many recent articles to include (1-20)</p>
+                <p class="help-text">1-20 recent articles</p>
             </div>
 
             <button type="submit" id="submit-btn">Generate Digest</button>
         </form>
 
         <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p class="loading-text">Scraping articles and generating summaries...</p>
-            <p class="loading-text" style="margin-top: 8px;">This may take a minute or two.</p>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+            <p class="loading-text">Gathering and summarizing articles...</p>
         </div>
-
-        <footer>
-            Powered by Claude AI &middot; <a href="https://github.com/cvs4bz49sb-oss/ai-article-digest" target="_blank">View on GitHub</a>
-        </footer>
     </div>
 
+    <footer>
+        Powered by Claude AI
+    </footer>
+
     <script>
+        // Create floating stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 20; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
         document.getElementById('digest-form').addEventListener('submit', function() {
             document.getElementById('submit-btn').disabled = true;
-            document.getElementById('submit-btn').textContent = 'Generating...';
+            document.getElementById('digest-form').style.display = 'none';
             document.getElementById('loading').classList.add('active');
         });
     </script>
