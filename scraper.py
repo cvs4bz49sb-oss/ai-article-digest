@@ -148,7 +148,10 @@ class ArticleScraper:
             "/tag/", "/tags/", "/category/", "/categories/",
             "/author/", "/page/", "/search", "/login", "/signup",
             "/contact", "/about", "/privacy", "/terms", "/subscribe",
-            "/feed", "/rss", "#", "javascript:", "mailto:"
+            "/feed", "/rss", "#", "javascript:", "mailto:",
+            # Additional patterns for sites like Unchained that use blog- prefix
+            "/blog-tag/", "/blog-category/", "/blog-author/",
+            "-tag/", "-category/", "-author/"
         ]
         url_lower = url.lower()
         return not any(pattern in url_lower for pattern in skip_patterns)
@@ -159,13 +162,16 @@ class ArticleScraper:
         parsed_base = urlparse(self.base_url)
         base_domain = parsed_base.netloc
 
-        # Strategy 1: Look for card-based layouts (like Mere Orthodoxy)
+        # Strategy 1: Look for card-based layouts (like Mere Orthodoxy, Unchained)
         card_selectors = [
             ".section--listing--card",
             ".post-card",
             ".article-card",
             ".entry-card",
             ".blog-card",
+            "[class*='blog-card']",
+            "[class*='post-card']",
+            "[class*='article-card']",
             "[class*='card']"
         ]
 
