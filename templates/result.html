@@ -82,8 +82,19 @@
             font-size: 32px;
             font-weight: 500;
             line-height: 1.3;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             text-align: center;
+        }
+
+        .combined-summary {
+            color: #4a5568;
+            font-size: 18px;
+            line-height: 1.7;
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .section-title {
@@ -646,6 +657,10 @@
 
         <h1 class="headline" id="headline">{{ digest.headline }}</h1>
 
+        {% if digest.combined_summary %}
+        <p class="combined-summary" id="combined-summary">{{ digest.combined_summary }}</p>
+        {% endif %}
+
         <h2 class="section-title" id="section-title">Articles</h2>
 
         {% for article in digest.article_summaries %}
@@ -736,9 +751,16 @@
                         h1 {
                             font-size: ${brand.headlineSize || 28}px;
                             text-align: center;
-                            margin-bottom: 40px;
+                            margin-bottom: 20px;
                             color: ${brand.headlineColor || '#2c3e50'};
                             font-family: ${brand.headlineFont || "'Lora', Georgia, serif"};
+                        }
+                        .combined-summary {
+                            font-size: 16px;
+                            text-align: center;
+                            margin-bottom: 40px;
+                            color: ${brand.bodyColor || '#4a5568'};
+                            line-height: ${brand.lineHeight || 1.7};
                         }
                         h2 {
                             font-size: 14px;
@@ -787,7 +809,8 @@
                 <title>${headline}</title>
                 <style>
                     body { font-family: Georgia, serif; max-width: 700px; margin: 0 auto; }
-                    h1 { font-size: 24pt; text-align: center; margin-bottom: 30pt; }
+                    h1 { font-size: 24pt; text-align: center; margin-bottom: 15pt; }
+                    .combined-summary { font-size: 14pt; text-align: center; margin-bottom: 30pt; color: #4a5568; line-height: 1.6; }
                     h2 { font-size: 12pt; text-transform: uppercase; letter-spacing: 2px; color: #5d7a8c; text-align: center; margin-bottom: 20pt; }
                     .article { margin-bottom: 20pt; }
                     .article-number { color: #5d7a8c; font-size: 11pt; margin-bottom: 6pt; }
@@ -797,6 +820,7 @@
             </head>
             <body>
                 <h1>${headline}</h1>
+                {% if digest.combined_summary %}<p class="combined-summary">{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') }}</p>{% endif %}
                 <h2>Articles</h2>`;
 
             {% for article in digest.article_summaries %}
@@ -832,6 +856,14 @@
                     headline.style.color = brand.headlineColor || '#2c3e50';
                     headline.style.fontFamily = brand.headlineFont || "'Lora', Georgia, serif";
                     headline.style.fontSize = (brand.headlineSize || 32) + 'px';
+                }
+
+                // Apply combined summary styles
+                const combinedSummary = document.getElementById('combined-summary');
+                if (combinedSummary) {
+                    combinedSummary.style.color = brand.bodyColor || '#4a5568';
+                    combinedSummary.style.fontFamily = brand.bodyFont || "'Lora', Georgia, serif";
+                    combinedSummary.style.lineHeight = brand.lineHeight || 1.7;
                 }
 
                 // Apply section title styles
@@ -886,6 +918,7 @@
         (function saveToHistory() {
             const digestData = {
                 headline: `{{ digest.headline | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') }}`,
+                combined_summary: `{{ digest.combined_summary | replace("'", "\\'") | replace('"', '\\"') | replace('\n', ' ') if digest.combined_summary else '' }}`,
                 article_summaries: [
                     {% for article in digest.article_summaries %}
                     {
@@ -981,6 +1014,13 @@
                 headline.style.color = brand.headlineColor;
                 headline.style.fontFamily = brand.headlineFont;
                 headline.style.fontSize = brand.headlineSize + 'px';
+            }
+
+            const combinedSummary = document.getElementById('combined-summary');
+            if (combinedSummary) {
+                combinedSummary.style.color = brand.bodyColor;
+                combinedSummary.style.fontFamily = brand.bodyFont;
+                combinedSummary.style.lineHeight = brand.lineHeight;
             }
 
             const sectionTitle = document.getElementById('section-title');

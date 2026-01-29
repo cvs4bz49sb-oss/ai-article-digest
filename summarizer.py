@@ -68,7 +68,7 @@ BAD example (too vague):
 Remember: Start with an active VERB, not the author's name. The author name is added separately."""
 
 
-def create_summary_prompt(articles: list[Article]) -> str:
+def create_summary_prompt(articles: list[Article], site_name: str = "the publication") -> str:
     """Create the prompt for generating summaries."""
     articles_text = ""
     for i, article in enumerate(articles, 1):
@@ -84,15 +84,21 @@ Content:
 ---
 """
 
-    return f"""Generate a complete digest for the following {len(articles)} articles.
+    return f"""Generate a complete digest for the following {len(articles)} articles from {site_name}.
 
 {articles_text}
 
 Please provide:
 
-1. **HEADLINE**: Create a compelling, intellectually engaging headline for the digest. Reference the most interesting 1-2 articles. Format: "This Week At Mere Orthodoxy" style - elegant and understated.
+1. **HEADLINE**: Create a compelling, intellectually engaging headline for the digest. Reference themes from the most interesting articles. Format should be elegant and substantive - capturing the intellectual essence of the collection.
 
-2. **INDIVIDUAL SUMMARIES**: For each article, provide:
+2. **COMBINED SUMMARY**: Write a 2-3 sentence paragraph summarizing the themes across ALL the articles. This paragraph should:
+   - Start with "This week's {site_name} Digest examines..."
+   - Weave together the main themes, arguments, and ideas from the collection
+   - Be intellectually engaging and sophisticated
+   - About 40-60 words total
+
+3. **INDIVIDUAL SUMMARIES**: For each article, provide:
    - The article title (exactly as given)
    - The author name (exactly as given)
    - A summary that STARTS WITH AN ACTIVE VERB (examines, argues, traces, frames, looks at, contends, etc.)
@@ -102,6 +108,8 @@ Please provide:
 Format your response EXACTLY as follows (this format will be parsed programmatically):
 
 HEADLINE: [Your headline here]
+
+COMBINED_SUMMARY: [Your 2-3 sentence thematic summary here]
 
 ARTICLE_SUMMARIES:
 1. TITLE: [Article 1 title]
@@ -125,12 +133,12 @@ class DigestGenerator:
             raise ValueError("ANTHROPIC_API_KEY not found. Please set it in your .env file.")
         self.client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
-    def generate_digest(self, articles: list[Article], progress_callback=None) -> dict:
+    def generate_digest(self, articles: list[Article], progress_callback=None, site_name: str = "the publication") -> dict:
         """Generate the complete digest for a list of articles."""
         if progress_callback:
             progress_callback("Sending articles to Claude for summarization...")
 
-        prompt = create_summary_prompt(articles)
+        prompt = create_summary_prompt(articles, site_name=site_name)
 
         message = self.client.messages.create(
             model=CLAUDE_MODEL,
@@ -166,10 +174,16 @@ class DigestGenerator:
 
             if line.startswith("HEADLINE:"):
                 result["headline"] = line.replace("HEADLINE:", "").strip()
+                current_section = "headline"
             elif line.startswith("COMBINED_SUMMARY:"):
                 result["combined_summary"] = line.replace("COMBINED_SUMMARY:", "").strip()
+                current_section = "combined_summary"
             elif line.startswith("ARTICLE_SUMMARIES:"):
                 current_section = "articles"
+            elif current_section == "combined_summary":
+                # Continue building combined summary until we hit ARTICLE_SUMMARIES
+                if not line.startswith(("HEADLINE:", "ARTICLE_SUMMARIES:", "1.", "TITLE:")):
+                    result["combined_summary"] += " " + line
             elif current_section == "articles":
                 if line[0].isdigit() and ". TITLE:" in line:
                     if current_article:
@@ -198,6 +212,9 @@ class DigestGenerator:
             if i < len(articles):
                 summary["url"] = articles[i].url
 
+        # Clean up combined summary
+        result["combined_summary"] = " ".join(result["combined_summary"].split())
+
         return result
 
     def format_digest(self, digest: dict) -> str:
@@ -207,6 +224,12 @@ class DigestGenerator:
         # Headline
         output.append(digest["headline"])
         output.append("")
+
+        # Combined summary
+        if digest.get("combined_summary"):
+            output.append(digest["combined_summary"])
+            output.append("")
+
         output.append("Articles")
         output.append("")
 

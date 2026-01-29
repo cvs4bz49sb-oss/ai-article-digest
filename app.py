@@ -45,14 +45,14 @@ def generate():
     try:
         # Scrape articles
         scraper = ArticleScraper(url)
-        articles = scraper.scrape_articles(count)
+        articles, site_name = scraper.scrape_articles(count)
 
         if not articles:
             return render_template("index.html", error="No articles found at that URL")
 
         # Generate digest
         generator = DigestGenerator()
-        digest = generator.generate_digest(articles)
+        digest = generator.generate_digest(articles, site_name=site_name)
         formatted = generator.format_digest(digest)
 
         return render_template(
@@ -92,13 +92,13 @@ def api_generate():
 
     try:
         scraper = ArticleScraper(url)
-        articles = scraper.scrape_articles(count)
+        articles, site_name = scraper.scrape_articles(count)
 
         if not articles:
             return jsonify({"error": "No articles found"}), 404
 
         generator = DigestGenerator()
-        digest = generator.generate_digest(articles)
+        digest = generator.generate_digest(articles, site_name=site_name)
 
         return jsonify({
             "success": True,

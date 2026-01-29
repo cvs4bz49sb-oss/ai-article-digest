@@ -376,8 +376,57 @@ class ArticleScraper:
             print(f"  Warning: Failed to scrape {url}: {e}")
             return None
 
-    def scrape_articles(self, count: int, progress_callback=None) -> list[Article]:
-        """Scrape articles from the website."""
+    def _extract_site_name(self, soup: BeautifulSoup) -> str:
+        """Extract the site/publication name from the page."""
+        # Try various methods to get the site name
+
+        # Method 1: Look for og:site_name meta tag
+        og_site = soup.find("meta", property="og:site_name")
+        if og_site and og_site.get("content"):
+            return og_site["content"].strip()
+
+        # Method 2: Look for application-name meta tag
+        app_name = soup.find("meta", attrs={"name": "application-name"})
+        if app_name and app_name.get("content"):
+            return app_name["content"].strip()
+
+        # Method 3: Extract from title tag (often "Site Name | Tagline" or "Page Title - Site Name")
+        title_tag = soup.find("title")
+        if title_tag:
+            title_text = title_tag.get_text(strip=True)
+            # Generic words that shouldn't be used as site names
+            generic_words = {"blog", "news", "articles", "posts", "home", "homepage", "main"}
+            # Look for common separators
+            for sep in [" | ", " - ", " – ", " — ", " :: "]:
+                if sep in title_text:
+                    parts = title_text.split(sep)
+                    # Filter out very short parts and generic words
+                    valid_parts = [
+                        p.strip() for p in parts
+                        if len(p.strip()) > 2 and p.strip().lower() not in generic_words
+                    ]
+                    if valid_parts:
+                        # Choose the shortest valid part as the site name
+                        site_name = min(valid_parts, key=len)
+                        if len(site_name) < 50:
+                            return site_name
+
+        # Method 4: Use the domain name, cleaned up
+        parsed = urlparse(self.base_url)
+        domain = parsed.netloc
+        # Remove www. prefix and .com/.org/etc suffix
+        domain = domain.replace("www.", "")
+        # Get just the main part before .com etc
+        domain_parts = domain.split(".")
+        if len(domain_parts) >= 2:
+            site_name = domain_parts[0]
+            # Capitalize first letter
+            return site_name.title()
+
+        return domain
+
+    def scrape_articles(self, count: int, progress_callback=None) -> tuple[list[Article], str]:
+        """Scrape articles from the website. Returns (articles, site_name)."""
         if not self._check_robots_txt():
             print("Warning: robots.txt may disallow scraping. Proceeding with caution...")
 
@@ -387,6 +436,9 @@ class ArticleScraper:
         soup = self._fetch_page(self.base_url)
         if not soup:
             raise RuntimeError(f"Failed to fetch main page: {self.base_url}")
+
+        # Extract site name
+        site_name = self._extract_site_name(soup)
 
         if progress_callback:
             progress_callback("Extracting article links...")
@@ -416,4 +468,4 @@ class ArticleScraper:
         if not articles:
             raise RuntimeError("Failed to scrape any articles. The website structure may not be supported.")
 
-        return articles
+        return articles, site_name
