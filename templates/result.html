@@ -722,13 +722,15 @@
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Generate another digest
+            Generate another
         </a>
 
         <div class="logo-container" id="logo-container" style="display: none; text-align: center; margin-bottom: 24px;">
             <img id="brand-logo" src="" alt="Logo" style="max-width: 200px; max-height: 80px;">
         </div>
 
+        {% if output_type != 'social' %}
+        <!-- Digest Section -->
         <h1 class="headline" id="headline">{{ digest.headline }}</h1>
 
         {% if digest.combined_summary %}
@@ -761,9 +763,11 @@
                 Copied!
             </span>
         </div>
+        {% endif %}
 
-        {% if digest.social_posts %}
-        <div class="social-section">
+        {% if output_type != 'digest' and digest.social_posts %}
+        <!-- Social Media Section -->
+        <div class="social-section" {% if output_type == 'social' %}style="margin-top: 0; padding-top: 0; border-top: none;"{% endif %}>
             <h2 class="section-title">Social Media Posts</h2>
 
             {% for post in digest.social_posts %}
@@ -774,6 +778,12 @@
                 <p class="social-post-link"><a href="{{ post.url }}" target="_blank">{{ post.url }}</a></p>
             </div>
             {% endfor %}
+
+            {% if output_type == 'social' %}
+            <div class="actions" style="margin-top: 32px;">
+                <a href="/" class="btn btn-secondary">Generate Another</a>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 

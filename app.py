@@ -29,6 +29,7 @@ def generate():
     """Generate a digest from the submitted URL."""
     url = request.form.get("url", "").strip()
     mode = request.form.get("mode", "recent")
+    output_type = request.form.get("output_type", "both")  # digest, social, or both
     count = request.form.get("count", "10")
     specific_urls = request.form.get("specific_urls", "").strip()
 
@@ -38,14 +39,15 @@ def generate():
     except ValueError:
         count = 10
 
-    if not url:
+    # For specific mode, URL is not required
+    if mode != "specific" and not url:
         return render_template("index.html", error="Please enter a URL")
 
-    if not url.startswith(("http://", "https://")):
+    if url and not url.startswith(("http://", "https://")):
         url = "https://" + url
 
     try:
-        scraper = ArticleScraper(url)
+        scraper = ArticleScraper(url) if url else None
 
         if mode == "specific" and specific_urls:
             # Parse specific URLs from textarea
@@ -54,6 +56,10 @@ def generate():
 
             if not urls_list:
                 return render_template("index.html", error="Please provide at least one article URL")
+
+            # Create scraper from first URL's domain if not already created
+            if not scraper:
+                scraper = ArticleScraper(urls_list[0])
 
             # Scrape specific articles
             articles, site_name = scraper.scrape_specific_articles(urls_list)
@@ -64,17 +70,18 @@ def generate():
         if not articles:
             return render_template("index.html", error="No articles found at that URL")
 
-        # Generate digest
+        # Generate content based on output_type
         generator = DigestGenerator()
-        digest = generator.generate_digest(articles, site_name=site_name)
-        formatted = generator.format_digest(digest)
+        digest = generator.generate_digest(articles, site_name=site_name, output_type=output_type)
+        formatted = generator.format_digest(digest) if output_type in ['digest', 'both'] else ""
 
         return render_template(
             "result.html",
             digest=digest,
             formatted=formatted,
-            url=url,
-            count=len(articles)
+            url=url or urls_list[0] if mode == "specific" else url,
+            count=len(articles),
+            output_type=output_type
         )
 
     except ValueError as e:

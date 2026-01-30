@@ -463,7 +463,16 @@
 
         <form action="/generate" method="POST" id="digest-form">
             <input type="hidden" id="mode" name="mode" value="recent">
+            <input type="hidden" id="output_type" name="output_type" value="both">
 
+            <!-- Output Type Toggle -->
+            <div class="mode-toggle" id="output-toggle">
+                <button type="button" class="mode-btn" data-output="digest" onclick="setOutputType('digest')">Digest</button>
+                <button type="button" class="mode-btn" data-output="social" onclick="setOutputType('social')">Social Media</button>
+                <button type="button" class="mode-btn active" data-output="both" onclick="setOutputType('both')">Both</button>
+            </div>
+
+            <!-- Source Toggle -->
             <div class="mode-toggle">
                 <button type="button" class="mode-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
                 <button type="button" class="mode-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
@@ -490,7 +499,7 @@
                 </div>
             </div>
 
-            <button type="submit" id="submit-btn">Generate Digest</button>
+            <button type="submit" id="submit-btn">Generate</button>
         </form>
 
         <div class="secondary-actions">
@@ -544,13 +553,35 @@
             starsContainer.appendChild(star);
         }
 
-        // Mode toggle
+        // Output type toggle
+        function setOutputType(type) {
+            document.getElementById('output_type').value = type;
+
+            // Update button states for output toggle only
+            document.querySelectorAll('#output-toggle .mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.output === type);
+            });
+
+            // Update submit button text
+            const submitBtn = document.getElementById('submit-btn');
+            if (type === 'digest') {
+                submitBtn.textContent = 'Generate Digest';
+            } else if (type === 'social') {
+                submitBtn.textContent = 'Generate Social Posts';
+            } else {
+                submitBtn.textContent = 'Generate Both';
+            }
+        }
+
+        // Source mode toggle
         function setMode(mode) {
             document.getElementById('mode').value = mode;
 
-            // Update button states
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
+            // Update button states for source toggle only (not output toggle)
+            document.querySelectorAll('.mode-toggle:not(#output-toggle) .mode-btn').forEach(btn => {
+                if (btn.dataset.mode) {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                }
             });
 
             // Show/hide content based on mode

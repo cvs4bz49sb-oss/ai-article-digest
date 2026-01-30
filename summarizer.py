@@ -68,8 +68,14 @@ BAD example (too vague):
 Remember: Start with an active VERB, not the author's name. The author name is added separately."""
 
 
-def create_summary_prompt(articles: list[Article], site_name: str = "the publication") -> str:
-    """Create the prompt for generating summaries."""
+def create_summary_prompt(articles: list[Article], site_name: str = "the publication", output_type: str = "both") -> str:
+    """Create the prompt for generating summaries.
+
+    Args:
+        articles: List of Article objects
+        site_name: Name of the publication
+        output_type: 'digest', 'social', or 'both'
+    """
     articles_text = ""
     for i, article in enumerate(articles, 1):
         articles_text += f"""
@@ -84,7 +90,76 @@ Content:
 ---
 """
 
-    return f"""Generate a complete digest for the following {len(articles)} articles from {site_name}.
+    # Build the prompt based on output_type
+    if output_type == "social":
+        return f"""Generate social media posts for the following {len(articles)} articles from {site_name}.
+
+{articles_text}
+
+For each article, provide a social media post with:
+- A compelling headline (can be the article title or a catchier version, max 10 words)
+- One sentence of compelling and accurate summary (punchy and shareable)
+- The post should make people want to click and read the full article
+
+Format your response EXACTLY as follows (this format will be parsed programmatically):
+
+SOCIAL_POSTS:
+1. POST_HEADLINE: [Catchy headline for social media]
+POST_SUMMARY: [One compelling sentence]
+
+2. POST_HEADLINE: [Catchy headline for social media]
+POST_SUMMARY: [One compelling sentence]
+
+[Continue for all articles...]"""
+
+    elif output_type == "digest":
+        return f"""Generate a complete digest for the following {len(articles)} articles from {site_name}.
+
+{articles_text}
+
+Please provide:
+
+1. **HEADLINE**: Create a compelling, intellectually engaging headline for the digest. Reference themes from the most interesting articles. Format should be elegant and substantive - capturing the intellectual essence of the collection.
+
+2. **COMBINED SUMMARY**: Write a 2-3 sentence paragraph that SPECIFICALLY describes the actual content of these articles. This paragraph should:
+   - Start with "This week's {site_name} Digest examines..."
+   - Reference SPECIFIC topics, arguments, or subjects from the articles (e.g., specific people, events, concepts, or debates mentioned)
+   - NOT use vague phrases like "themes of spiritual formation" or "cultural engagement" or "the search for community"
+   - Instead, mention CONCRETE specifics like: a particular author's argument, a specific historical figure, a named concept or book, a particular controversy or event
+   - About 40-60 words total
+
+   BAD example (too vague): "This week's Digest examines how Christians navigate technology and community, exploring themes of spiritual formation and cultural engagement."
+
+   GOOD example (specific): "This week's Mere Orthodoxy Digest examines smartphone addiction through Tony Reinke's digital minimalism framework, traces J.C. Ryle's influence on Anglican pastoral care, and considers whether evangelical fractures stem from class conflict rather than theological disagreement."
+
+3. **INDIVIDUAL SUMMARIES**: For each article, provide:
+   - The article title (exactly as given)
+   - The author name (exactly as given)
+   - A summary that STARTS WITH AN ACTIVE VERB (examines, argues, traces, frames, looks at, contends, etc.)
+   - DO NOT include the author's name in the summary - it will be added automatically
+   - Maximum 50 words per summary
+
+Format your response EXACTLY as follows (this format will be parsed programmatically):
+
+HEADLINE: [Your headline here]
+
+COMBINED_SUMMARY: [Your 2-3 sentence thematic summary here]
+
+ARTICLE_SUMMARIES:
+1. TITLE: [Article 1 title]
+AUTHOR: [Article 1 author]
+SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
+
+2. TITLE: [Article 2 title]
+AUTHOR: [Article 2 author]
+SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
+
+[Continue for all articles...]
+
+CRITICAL: Each summary must START WITH A VERB like "examines", "argues", "traces", "frames", "contends", "looks at". DO NOT start with the author's name."""
+
+    else:  # both
+        return f"""Generate a complete digest for the following {len(articles)} articles from {site_name}.
 
 {articles_text}
 
@@ -152,12 +227,19 @@ class DigestGenerator:
             raise ValueError("ANTHROPIC_API_KEY not found. Please set it in your .env file.")
         self.client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
-    def generate_digest(self, articles: list[Article], progress_callback=None, site_name: str = "the publication") -> dict:
-        """Generate the complete digest for a list of articles."""
+    def generate_digest(self, articles: list[Article], progress_callback=None, site_name: str = "the publication", output_type: str = "both") -> dict:
+        """Generate the complete digest for a list of articles.
+
+        Args:
+            articles: List of Article objects to summarize
+            progress_callback: Optional callback for progress updates
+            site_name: Name of the publication
+            output_type: 'digest', 'social', or 'both'
+        """
         if progress_callback:
             progress_callback("Sending articles to Claude for summarization...")
 
-        prompt = create_summary_prompt(articles, site_name=site_name)
+        prompt = create_summary_prompt(articles, site_name=site_name, output_type=output_type)
 
         message = self.client.messages.create(
             model=CLAUDE_MODEL,
@@ -172,9 +254,9 @@ class DigestGenerator:
             progress_callback("Parsing Claude's response...")
 
         response_text = message.content[0].text
-        return self._parse_response(response_text, articles)
+        return self._parse_response(response_text, articles, output_type=output_type)
 
-    def _parse_response(self, response: str, articles: list[Article]) -> dict:
+    def _parse_response(self, response: str, articles: list[Article], output_type: str = "both") -> dict:
         """Parse Claude's response into structured data."""
         result = {
             "headline": "",
