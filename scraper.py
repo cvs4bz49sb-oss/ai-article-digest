@@ -38,7 +38,7 @@ class ArticleScraper:
             "Accept-Language": "en-US,en;q=0.5",
         })
 
-    def _fetch_page(self, url: str) -> Optional[BeautifulSoup]:
+    def _fetch_page(self, url: str, allow_www_fallback: bool = True) -> Optional[BeautifulSoup]:
         """Fetch a page with retry logic."""
         for attempt in range(MAX_RETRIES):
             try:
@@ -49,6 +49,21 @@ class ArticleScraper:
                 if attempt < MAX_RETRIES - 1:
                     time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
+                    # If this is the base URL and it failed, try with www. prefix
+                    if allow_www_fallback and url == self.base_url:
+                        parsed = urlparse(url)
+                        if not parsed.netloc.startswith("www."):
+                            www_url = f"{parsed.scheme}://www.{parsed.netloc}{parsed.path}"
+                            if parsed.query:
+                                www_url += f"?{parsed.query}"
+                            try:
+                                response = self.session.get(www_url, timeout=REQUEST_TIMEOUT)
+                                response.raise_for_status()
+                                # Update base_url to use www version
+                                self.base_url = www_url
+                                return BeautifulSoup(response.text, "lxml")
+                            except requests.RequestException:
+                                pass  # Fall through to original error
                     raise RuntimeError(f"Failed to fetch {url} after {MAX_RETRIES} attempts: {e}")
         return None
 
@@ -167,16 +182,35 @@ class ArticleScraper:
             "/feed", "/rss", "#", "javascript:", "mailto:",
             # Additional patterns for sites like Unchained that use blog- prefix
             "/blog-tag/", "/blog-category/", "/blog-author/",
-            "-tag/", "-category/", "-author/"
+            "-tag/", "-category/", "-author/",
+            # Substack utility pages
+            "/archive", "/recommendations", "/podcast", "/notes"
         ]
         url_lower = url.lower()
         return not any(pattern in url_lower for pattern in skip_patterns)
+
+    def _is_substack_article_url(self, url: str) -> bool:
+        """Check if a URL is a Substack article URL (contains /p/)."""
+        return "/p/" in url.lower()
 
     def _extract_article_links(self, soup: BeautifulSoup) -> list[str]:
         """Extract article links from the main page."""
         links = []
         parsed_base = urlparse(self.base_url)
         base_domain = parsed_base.netloc
+
+        # Strategy 0: Look for Substack article links (/p/ pattern)
+        for link in soup.find_all("a", href=True):
+            href = link.get("href", "")
+            full_url = urljoin(self.base_url, href)
+            if self._is_substack_article_url(full_url):
+                parsed_url = urlparse(full_url)
+                # Make sure it's on the same domain or a relative link
+                if (base_domain in parsed_url.netloc or not parsed_url.netloc) and full_url not in links:
+                    links.append(full_url)
+
+        if links:
+            return links
 
         # Strategy 1: Look for card-based layouts (like Mere Orthodoxy, Unchained)
         card_selectors = [
@@ -408,7 +442,7 @@ class ArticleScraper:
         if title_tag:
             title_text = title_tag.get_text(strip=True)
             # Generic words that shouldn't be used as site names
-            generic_words = {"blog", "news", "articles", "posts", "home", "homepage", "main"}
+            generic_words = {"blog", "news", "articles", "posts", "home", "homepage", "main", "archive", "about"}
             # Look for common separators
             for sep in [" | ", " - ", " – ", " — ", " :: "]:
                 if sep in title_text:
@@ -419,8 +453,8 @@ class ArticleScraper:
                         if len(p.strip()) > 2 and p.strip().lower() not in generic_words
                     ]
                     if valid_parts:
-                        # Choose the shortest valid part as the site name
-                        site_name = min(valid_parts, key=len)
+                        # Choose the longest valid part (usually the site name, not "Archive" etc.)
+                        site_name = max(valid_parts, key=len)
                         if len(site_name) < 50:
                             return site_name
 
@@ -437,6 +471,23 @@ class ArticleScraper:
             return site_name.title()
 
         return domain
+
+    def _is_substack_site(self, soup: BeautifulSoup) -> bool:
+        """Check if this is a Substack site."""
+        # Check for Substack indicators
+        for script in soup.find_all("script", src=True):
+            if "substack" in script.get("src", "").lower():
+                return True
+        for link in soup.find_all("link", href=True):
+            if "substack" in link.get("href", "").lower():
+                return True
+        # Check for Substack meta tags
+        if soup.find("meta", {"content": lambda x: x and "substack" in x.lower()}):
+            return True
+        # Check for the "turn on JavaScript" message with Substack links
+        if soup.find("a", href=lambda x: x and "substack.com" in x):
+            return True
+        return False
 
     def scrape_articles(self, count: int, progress_callback=None) -> tuple[list[Article], str]:
         """Scrape articles from the website. Returns (articles, site_name)."""
@@ -457,6 +508,17 @@ class ArticleScraper:
             progress_callback("Extracting article links...")
 
         article_links = self._extract_article_links(soup)
+
+        # If no links found and it's a Substack site, try the /archive page
+        if not article_links and self._is_substack_site(soup):
+            if progress_callback:
+                progress_callback("Detected Substack site, trying archive page...")
+            archive_url = urljoin(self.base_url, "/archive")
+            archive_soup = self._fetch_page(archive_url, allow_www_fallback=False)
+            if archive_soup:
+                article_links = self._extract_article_links(archive_soup)
+                # Also get site name from archive page since main page is JS-only
+                site_name = self._extract_site_name(archive_soup)
 
         if not article_links:
             raise RuntimeError("No article links found on the page. The website structure may not be supported.")
