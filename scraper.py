@@ -40,32 +40,39 @@ class ArticleScraper:
 
     def _fetch_page(self, url: str, allow_www_fallback: bool = True) -> Optional[BeautifulSoup]:
         """Fetch a page with retry logic."""
+        last_error = None
+
         for attempt in range(MAX_RETRIES):
             try:
                 response = self.session.get(url, timeout=REQUEST_TIMEOUT)
                 response.raise_for_status()
                 return BeautifulSoup(response.text, "lxml")
             except requests.RequestException as e:
+                last_error = e
+                # Check if it's a DNS/resolution error - no point retrying
+                error_str = str(e).lower()
+                if "resolve" in error_str or "nodename" in error_str or "name resolution" in error_str:
+                    break  # Skip retries for DNS errors
                 if attempt < MAX_RETRIES - 1:
                     time.sleep(RETRY_DELAY * (attempt + 1))
-                else:
-                    # If this is the base URL and it failed, try with www. prefix
-                    if allow_www_fallback and url == self.base_url:
-                        parsed = urlparse(url)
-                        if not parsed.netloc.startswith("www."):
-                            www_url = f"{parsed.scheme}://www.{parsed.netloc}{parsed.path}"
-                            if parsed.query:
-                                www_url += f"?{parsed.query}"
-                            try:
-                                response = self.session.get(www_url, timeout=REQUEST_TIMEOUT)
-                                response.raise_for_status()
-                                # Update base_url to use www version
-                                self.base_url = www_url
-                                return BeautifulSoup(response.text, "lxml")
-                            except requests.RequestException:
-                                pass  # Fall through to original error
-                    raise RuntimeError(f"Failed to fetch {url} after {MAX_RETRIES} attempts: {e}")
-        return None
+
+        # If we got here, all attempts failed. Try www. fallback if applicable
+        if allow_www_fallback and url == self.base_url:
+            parsed = urlparse(url)
+            if not parsed.netloc.startswith("www."):
+                www_url = f"{parsed.scheme}://www.{parsed.netloc}{parsed.path}"
+                if parsed.query:
+                    www_url += f"?{parsed.query}"
+                try:
+                    response = self.session.get(www_url, timeout=REQUEST_TIMEOUT)
+                    response.raise_for_status()
+                    # Update base_url to use www version
+                    self.base_url = www_url
+                    return BeautifulSoup(response.text, "lxml")
+                except requests.RequestException:
+                    pass  # Fall through to original error
+
+        raise RuntimeError(f"Failed to fetch {url} after {MAX_RETRIES} attempts: {last_error}")
 
     def _check_robots_txt(self) -> bool:
         """Check if scraping is allowed by robots.txt."""
