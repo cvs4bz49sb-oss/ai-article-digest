@@ -6,7 +6,7 @@
     <title>Well Done Digest Generator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -16,97 +16,79 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #5d7a8c 0%, #8a9ea8 50%, #a8b5bc 100%);
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 480px;
+            max-width: 520px;
             width: 100%;
+        }
+
+        .header {
             text-align: center;
-        }
-
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: twinkle 3s ease-in-out infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+            margin-bottom: 48px;
         }
 
         h1 {
-            color: white;
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            font-family: 'Lora', Georgia, serif;
+            font-size: 32px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 12px;
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            font-weight: 300;
-            margin-bottom: 48px;
-            letter-spacing: 0.3px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-card {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 32px;
         }
 
         .form-group {
             margin-bottom: 24px;
-            text-align: left;
         }
 
         label {
             display: block;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 400;
-            margin-bottom: 10px;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin-bottom: 8px;
             font-size: 14px;
-            letter-spacing: 0.3px;
         }
 
         input[type="text"],
         input[type="number"] {
             width: 100%;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 12px;
-            font-size: 16px;
-            color: white;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #1a1a1a;
             font-family: inherit;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
         }
 
         input[type="text"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #999;
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.2);
+            border-color: #8b7355;
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
         }
 
         input[type="number"] {
@@ -115,57 +97,59 @@
 
         textarea {
             width: 100%;
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 12px;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
             font-size: 14px;
-            color: white;
+            color: #1a1a1a;
             font-family: inherit;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
             resize: vertical;
             min-height: 120px;
         }
 
         textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #999;
         }
 
         textarea:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.2);
+            border-color: #8b7355;
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
         }
 
-        .mode-toggle {
+        .toggle-group {
             display: flex;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
             padding: 4px;
             margin-bottom: 24px;
         }
 
-        .mode-btn {
+        .toggle-btn {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 16px;
             background: transparent;
             border: none;
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            color: #666;
             font-size: 14px;
             font-family: inherit;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .mode-btn.active {
-            background: rgba(255, 255, 255, 0.2);
+        .toggle-btn.active {
+            background: #8b7355;
             color: white;
         }
 
-        .mode-btn:hover:not(.active) {
-            color: white;
+        .toggle-btn:hover:not(.active) {
+            background: #f5f5f5;
+            color: #1a1a1a;
         }
 
         .mode-content {
@@ -178,114 +162,48 @@
 
         button[type="submit"] {
             width: 100%;
-            padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
+            padding: 16px 24px;
+            background: #8b7355;
+            border: none;
+            border-radius: 8px;
             color: white;
-            font-size: 16px;
-            font-weight: 400;
+            font-size: 15px;
+            font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            letter-spacing: 0.3px;
-            margin-top: 16px;
+            transition: all 0.2s ease;
+            margin-top: 8px;
         }
 
-        button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
+        button[type="submit"]:hover {
+            background: #7a6548;
         }
 
-        button:disabled {
+        button[type="submit"]:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
         .error {
-            background: rgba(220, 80, 80, 0.2);
-            border: 1px solid rgba(220, 80, 80, 0.4);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 14px 16px;
+            border-radius: 8px;
             margin-bottom: 24px;
             font-size: 14px;
-            backdrop-filter: blur(10px);
-        }
-
-        .loading {
-            display: none;
-            padding: 40px 20px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .loading-dots {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .loading-dot {
-            width: 6px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: float 2s ease-in-out infinite;
-        }
-
-        .loading-dot:nth-child(1) { animation-delay: 0s; }
-        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-        .loading-dot:nth-child(4) { animation-delay: 0.6s; }
-        .loading-dot:nth-child(5) { animation-delay: 0.8s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); opacity: 0.4; }
-            50% { transform: translateY(-10px); opacity: 1; }
-        }
-
-        .loading-text {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            font-weight: 300;
-            letter-spacing: 0.3px;
         }
 
         .help-text {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+            color: #666;
+            font-size: 13px;
             margin-top: 8px;
-        }
-
-        footer {
-            position: fixed;
-            bottom: 24px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-        }
-
-        footer a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            color: white;
         }
 
         .secondary-actions {
             display: flex;
             gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
             margin-top: 24px;
         }
 
@@ -295,22 +213,54 @@
             gap: 8px;
             padding: 12px 20px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            color: #666;
             font-size: 14px;
             font-family: inherit;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
         }
 
         .btn-history:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-            color: white;
+            background: #fafafa;
+            border-color: #8b7355;
+            color: #8b7355;
         }
 
+        /* Loading state */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 48px 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e5e5;
+            border-top-color: #8b7355;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 15px;
+        }
+
+        /* History Modal */
         .history-modal {
             display: none;
             position: fixed;
@@ -330,8 +280,8 @@
         }
 
         .history-content {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
+            background: #fff;
+            border-radius: 12px;
             max-width: 600px;
             width: 100%;
             max-height: 80vh;
@@ -344,27 +294,27 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px;
-            border-bottom: 1px solid rgba(93, 122, 140, 0.15);
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e5e5;
         }
 
         .history-header h2 {
-            color: #2c3e50;
-            font-size: 20px;
-            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 18px;
+            font-weight: 600;
         }
 
         .close-btn {
             background: none;
             border: none;
-            font-size: 28px;
-            color: #5d7a8c;
+            font-size: 24px;
+            color: #666;
             cursor: pointer;
             line-height: 1;
         }
 
         .close-btn:hover {
-            color: #2c3e50;
+            color: #1a1a1a;
         }
 
         .history-list {
@@ -374,16 +324,16 @@
 
         .history-item {
             padding: 16px;
-            border: 1px solid rgba(93, 122, 140, 0.15);
-            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .history-item:hover {
-            background: rgba(93, 122, 140, 0.05);
-            border-color: rgba(93, 122, 140, 0.3);
+            background: #fafafa;
+            border-color: #8b7355;
         }
 
         .history-item:last-child {
@@ -392,26 +342,26 @@
 
         .history-item-date {
             font-size: 12px;
-            color: #5d7a8c;
+            color: #999;
             margin-bottom: 8px;
         }
 
         .history-item-headline {
-            font-size: 16px;
-            color: #2c3e50;
-            font-weight: 500;
+            font-size: 15px;
+            color: #1a1a1a;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
         .history-item-meta {
             font-size: 13px;
-            color: #718096;
+            color: #666;
         }
 
         .history-empty {
             text-align: center;
             padding: 40px;
-            color: #718096;
+            color: #666;
         }
 
         .history-actions {
@@ -427,80 +377,111 @@
             border: none;
             cursor: pointer;
             font-family: inherit;
+            font-weight: 500;
             transition: all 0.2s ease;
         }
 
         .history-action-btn.view {
-            background: #5d7a8c;
+            background: #8b7355;
             color: white;
         }
 
         .history-action-btn.view:hover {
-            background: #4d6a7c;
+            background: #7a6548;
         }
 
         .history-action-btn.delete {
             background: transparent;
-            color: #dc5050;
-            border: 1px solid rgba(220, 80, 80, 0.3);
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
 
         .history-action-btn.delete:hover {
-            background: rgba(220, 80, 80, 0.1);
+            background: #fef2f2;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .form-card {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="stars" id="stars"></div>
-
     <div class="container">
-        <h1>Well Done Digest</h1>
-        <p class="subtitle">Transform any blog into an intellectually rigorous digest</p>
+        <div class="header">
+            <h1>Well Done Digest</h1>
+            <p class="subtitle">Transform any blog into an intellectually rigorous digest</p>
+        </div>
 
         {% if error %}
         <div class="error">{{ error }}</div>
         {% endif %}
 
-        <form action="/generate" method="POST" id="digest-form">
-            <input type="hidden" id="mode" name="mode" value="recent">
-            <input type="hidden" id="output_type" name="output_type" value="both">
+        <div class="form-card">
+            <form action="/generate" method="POST" id="digest-form">
+                <input type="hidden" id="mode" name="mode" value="recent">
+                <input type="hidden" id="output_type" name="output_type" value="both">
 
-            <!-- Output Type Toggle -->
-            <div class="mode-toggle" id="output-toggle">
-                <button type="button" class="mode-btn" data-output="digest" onclick="setOutputType('digest')">Digest</button>
-                <button type="button" class="mode-btn" data-output="social" onclick="setOutputType('social')">Social Media</button>
-                <button type="button" class="mode-btn active" data-output="both" onclick="setOutputType('both')">Both</button>
-            </div>
-
-            <!-- Source Toggle -->
-            <div class="mode-toggle">
-                <button type="button" class="mode-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
-                <button type="button" class="mode-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
-            </div>
-
-            <div class="form-group" id="url-group">
-                <label for="url">Website URL</label>
-                <input type="text" id="url" name="url" placeholder="example-blog.com" required>
-            </div>
-
-            <div class="mode-content active" id="mode-recent">
+                <!-- Output Type Toggle -->
                 <div class="form-group">
-                    <label for="count">Number of Articles</label>
-                    <input type="number" id="count" name="count" value="10" min="1" max="20">
-                    <p class="help-text">1-20 recent articles from the site</p>
+                    <label>Output Type</label>
+                    <div class="toggle-group" id="output-toggle">
+                        <button type="button" class="toggle-btn" data-output="digest" onclick="setOutputType('digest')">Digest</button>
+                        <button type="button" class="toggle-btn" data-output="social" onclick="setOutputType('social')">Social</button>
+                        <button type="button" class="toggle-btn active" data-output="both" onclick="setOutputType('both')">Both</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="mode-content" id="mode-specific">
+                <!-- Source Toggle -->
                 <div class="form-group">
-                    <label for="specific_urls">Article URLs</label>
-                    <textarea id="specific_urls" name="specific_urls" placeholder="Paste article URLs here, one per line:&#10;https://example.com/article-1&#10;https://example.com/article-2&#10;https://example.com/article-3"></textarea>
-                    <p class="help-text">Paste one URL per line</p>
+                    <label>Source</label>
+                    <div class="toggle-group" id="source-toggle">
+                        <button type="button" class="toggle-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
+                        <button type="button" class="toggle-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" id="submit-btn">Generate</button>
-        </form>
+                <div class="form-group" id="url-group">
+                    <label for="url">Website URL</label>
+                    <input type="text" id="url" name="url" placeholder="example-blog.com" required>
+                </div>
+
+                <div class="mode-content active" id="mode-recent">
+                    <div class="form-group">
+                        <label for="count">Number of Articles</label>
+                        <input type="number" id="count" name="count" value="10" min="1" max="20">
+                        <p class="help-text">1-20 recent articles from the site</p>
+                    </div>
+                </div>
+
+                <div class="mode-content" id="mode-specific">
+                    <div class="form-group">
+                        <label for="specific_urls">Article URLs</label>
+                        <textarea id="specific_urls" name="specific_urls" placeholder="Paste article URLs here, one per line"></textarea>
+                        <p class="help-text">One URL per line</p>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn">Generate</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Gathering and summarizing articles...</p>
+            </div>
+        </div>
 
         <div class="secondary-actions">
             <button class="btn-history" id="history-btn" onclick="showHistory()" style="display: none;">
@@ -510,7 +491,6 @@
                 </svg>
                 View History
             </button>
-
         </div>
 
         <div class="history-modal" id="history-modal">
@@ -520,49 +500,24 @@
                     <button class="close-btn" onclick="closeHistory()">&times;</button>
                 </div>
                 <div class="history-list" id="history-list">
-                    <!-- History items will be inserted here -->
                 </div>
             </div>
         </div>
 
-        <div class="loading" id="loading">
-            <div class="loading-dots">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-            </div>
-            <p class="loading-text">Gathering and summarizing articles...</p>
-        </div>
+        <footer>
+            Powered by Claude AI
+        </footer>
     </div>
 
-    <footer>
-        Powered by Claude AI
-    </footer>
-
     <script>
-        // Create floating stars
-        const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 20; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 3 + 's';
-            starsContainer.appendChild(star);
-        }
-
         // Output type toggle
         function setOutputType(type) {
             document.getElementById('output_type').value = type;
 
-            // Update button states for output toggle only
-            document.querySelectorAll('#output-toggle .mode-btn').forEach(btn => {
+            document.querySelectorAll('#output-toggle .toggle-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.output === type);
             });
 
-            // Update submit button text
             const submitBtn = document.getElementById('submit-btn');
             if (type === 'digest') {
                 submitBtn.textContent = 'Generate Digest';
@@ -577,20 +532,15 @@
         function setMode(mode) {
             document.getElementById('mode').value = mode;
 
-            // Update button states for source toggle only (not output toggle)
-            document.querySelectorAll('.mode-toggle:not(#output-toggle) .mode-btn').forEach(btn => {
-                if (btn.dataset.mode) {
-                    btn.classList.toggle('active', btn.dataset.mode === mode);
-                }
+            document.querySelectorAll('#source-toggle .toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
             });
 
-            // Show/hide content based on mode
             const urlGroup = document.getElementById('url-group');
             const urlInput = document.getElementById('url');
             document.getElementById('mode-recent').classList.toggle('active', mode === 'recent');
             document.getElementById('mode-specific').classList.toggle('active', mode === 'specific');
 
-            // In specific mode, hide URL box; in recent mode, show it
             if (mode === 'specific') {
                 urlGroup.style.display = 'none';
                 urlInput.removeAttribute('required');
@@ -659,7 +609,6 @@
             const history = getHistory();
             const item = history[index];
             if (item && item.digestData) {
-                // Store the selected item for the result page
                 sessionStorage.setItem('viewingHistoryItem', JSON.stringify(item));
                 window.location.href = '/history-view';
             }
@@ -669,18 +618,16 @@
             const history = getHistory();
             history.splice(index, 1);
             localStorage.setItem('digestHistory', JSON.stringify(history));
-            showHistory(); // Refresh the list
-            checkHistory(); // Update button visibility
+            showHistory();
+            checkHistory();
         }
 
-        // Close modal when clicking outside
         document.getElementById('history-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeHistory();
             }
         });
 
-        // Check for history on page load
         checkHistory();
     </script>
 </body>
