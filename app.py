@@ -49,6 +49,8 @@ def send_magic_link_email(email: str, magic_link: str) -> bool:
         print(f"SMTP not configured. Magic link: {magic_link}")
         return True  # Return True for development
 
+    print(f"Attempting to send email via {smtp_host}:{smtp_port} as {smtp_user}")
+
     try:
         msg = MIMEMultipart('alternative')
         msg['Subject'] = 'Sign in to Well Done Digest'
