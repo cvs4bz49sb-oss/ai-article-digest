@@ -407,6 +407,82 @@
             font-size: 13px;
         }
 
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .user-bar .email {
+            color: #666;
+        }
+
+        .user-bar .credits {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .credit-badge {
+            background: #8b7355;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .credit-badge.low {
+            background: #dc2626;
+        }
+
+        .credit-badge.admin {
+            background: #059669;
+        }
+
+        .user-link {
+            color: #8b7355;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .user-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-prompt {
+            text-align: center;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .login-prompt p {
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .login-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #8b7355;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .login-btn:hover {
+            background: #7a6548;
+        }
+
         @media (max-width: 640px) {
             .form-card {
                 padding: 24px;
@@ -427,6 +503,26 @@
 
         {% if error %}
         <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if user %}
+        <div class="user-bar">
+            <span class="email">{{ user.email }}</span>
+            <div class="credits">
+                {% if user.is_admin %}
+                <span class="credit-badge admin">Unlimited</span>
+                {% else %}
+                <span class="credit-badge {% if user.credits == 0 %}low{% endif %}">{{ user.credits }} credit{% if user.credits != 1 %}s{% endif %}</span>
+                <a href="/pricing" class="user-link">Buy more</a>
+                {% endif %}
+                <a href="/auth/logout" class="user-link">Sign out</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <p>Sign in to generate digests</p>
+            <a href="/login" class="login-btn">Sign In</a>
+        </div>
         {% endif %}
 
         <div class="form-card">
