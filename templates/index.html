@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #ffffff;
+            background: #e8e0d4;
             color: #1a1a1a;
             line-height: 1.6;
             min-height: 100vh;
@@ -45,14 +45,15 @@
         }
 
         .subtitle {
-            color: #666;
+            color: #7a7168;
             font-size: 16px;
         }
 
         .form-card {
-            background: #fafafa;
-            border-radius: 12px;
-            padding: 32px;
+            background: #e8e0d4;
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 8px 8px 16px rgba(0,0,0,0.1), -8px -8px 16px rgba(255,255,255,0.7);
         }
 
         .form-group {
@@ -71,24 +72,24 @@
         input[type="number"] {
             width: 100%;
             padding: 14px 16px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 12px;
             font-size: 15px;
             color: #1a1a1a;
             font-family: inherit;
             transition: all 0.2s ease;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
         }
 
         input[type="text"]::placeholder {
-            color: #999;
+            color: #a09585;
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
             outline: none;
-            border-color: #8b7355;
-            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.12), inset -3px -3px 6px rgba(255,255,255,0.5), 0 0 0 2px rgba(139, 115, 85, 0.3);
         }
 
         input[type="number"] {
@@ -98,34 +99,35 @@
         textarea {
             width: 100%;
             padding: 14px 16px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 12px;
             font-size: 14px;
             color: #1a1a1a;
             font-family: inherit;
             transition: all 0.2s ease;
             resize: vertical;
             min-height: 120px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
         }
 
         textarea::placeholder {
-            color: #999;
+            color: #a09585;
         }
 
         textarea:focus {
             outline: none;
-            border-color: #8b7355;
-            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.12), inset -3px -3px 6px rgba(255,255,255,0.5), 0 0 0 2px rgba(139, 115, 85, 0.3);
         }
 
         .toggle-group {
             display: flex;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 4px;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 24px;
+            padding: 5px;
             margin-bottom: 24px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
         }
 
         .toggle-btn {
@@ -133,22 +135,22 @@
             padding: 10px 16px;
             background: transparent;
             border: none;
-            border-radius: 6px;
-            color: #666;
+            border-radius: 20px;
+            color: #7a7168;
             font-size: 14px;
             font-family: inherit;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .toggle-btn.active {
             background: #8b7355;
             color: white;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.15), -2px -2px 5px rgba(255,255,255,0.4);
         }
 
         .toggle-btn:hover:not(.active) {
-            background: #f5f5f5;
             color: #1a1a1a;
         }
 
@@ -165,7 +167,7 @@
             padding: 16px 24px;
             background: #8b7355;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             color: white;
             font-size: 15px;
             font-weight: 600;
@@ -173,29 +175,38 @@
             cursor: pointer;
             transition: all 0.2s ease;
             margin-top: 8px;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.15), -4px -4px 10px rgba(255,255,255,0.5);
         }
 
         button[type="submit"]:hover {
             background: #7a6548;
+            box-shadow: 5px 5px 12px rgba(0,0,0,0.18), -5px -5px 12px rgba(255,255,255,0.5);
+        }
+
+        button[type="submit"]:active {
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2), inset -3px -3px 6px rgba(255,255,255,0.2);
         }
 
         button[type="submit"]:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+            background: #e8e0d4;
+            border: none;
+            color: #c62828;
             padding: 14px 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 24px;
             font-size: 14px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
+            border-left: 4px solid #c62828;
         }
 
         .help-text {
-            color: #666;
+            color: #7a7168;
             font-size: 13px;
             margin-top: 8px;
         }
@@ -212,22 +223,26 @@
             align-items: center;
             gap: 8px;
             padding: 12px 20px;
-            background: transparent;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            color: #666;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 12px;
+            color: #7a7168;
             font-size: 14px;
             font-family: inherit;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.1), -4px -4px 8px rgba(255,255,255,0.7);
         }
 
         .btn-history:hover {
-            background: #fafafa;
-            border-color: #8b7355;
             color: #8b7355;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.12), -5px -5px 10px rgba(255,255,255,0.7);
+        }
+
+        .btn-history:active {
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         /* Loading state */
@@ -244,7 +259,7 @@
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #e5e5e5;
+            border: 3px solid rgba(0,0,0,0.08);
             border-top-color: #8b7355;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -256,7 +271,7 @@
         }
 
         .loading-text {
-            color: #666;
+            color: #7a7168;
             font-size: 15px;
         }
 
@@ -268,7 +283,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -280,22 +297,23 @@
         }
 
         .history-content {
-            background: #fff;
-            border-radius: 12px;
+            background: #e8e0d4;
+            border-radius: 20px;
             max-width: 600px;
             width: 100%;
             max-height: 80vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 12px 12px 24px rgba(0,0,0,0.15), -12px -12px 24px rgba(255,255,255,0.6);
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e5e5e5;
+            padding: 24px 28px;
+            border-bottom: none;
         }
 
         .history-header h2 {
@@ -305,35 +323,49 @@
         }
 
         .close-btn {
-            background: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e8e0d4;
             border: none;
-            font-size: 24px;
-            color: #666;
+            border-radius: 50%;
+            font-size: 18px;
+            color: #7a7168;
             cursor: pointer;
             line-height: 1;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -3px -3px 6px rgba(255,255,255,0.7);
+            transition: all 0.2s ease;
         }
 
         .close-btn:hover {
             color: #1a1a1a;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.12), -4px -4px 8px rgba(255,255,255,0.7);
+        }
+
+        .close-btn:active {
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         .history-list {
             overflow-y: auto;
-            padding: 16px 24px;
+            padding: 8px 24px 24px;
         }
 
         .history-item {
             padding: 16px;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
+            border: none;
+            border-radius: 14px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
+            background: #e8e0d4;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.08), -4px -4px 8px rgba(255,255,255,0.6);
         }
 
         .history-item:hover {
-            background: #fafafa;
-            border-color: #8b7355;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.12), -5px -5px 10px rgba(255,255,255,0.6);
         }
 
         .history-item:last-child {
@@ -342,7 +374,7 @@
 
         .history-item-date {
             font-size: 12px;
-            color: #999;
+            color: #a09585;
             margin-bottom: 8px;
         }
 
@@ -355,13 +387,13 @@
 
         .history-item-meta {
             font-size: 13px;
-            color: #666;
+            color: #7a7168;
         }
 
         .history-empty {
             text-align: center;
             padding: 40px;
-            color: #666;
+            color: #7a7168;
         }
 
         .history-actions {
@@ -373,7 +405,7 @@
         .history-action-btn {
             padding: 8px 16px;
             font-size: 12px;
-            border-radius: 6px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             font-family: inherit;
@@ -384,6 +416,7 @@
         .history-action-btn.view {
             background: #8b7355;
             color: white;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.12), -2px -2px 4px rgba(255,255,255,0.4);
         }
 
         .history-action-btn.view:hover {
@@ -391,13 +424,13 @@
         }
 
         .history-action-btn.delete {
-            background: transparent;
-            color: #dc2626;
-            border: 1px solid #fecaca;
+            background: #e8e0d4;
+            color: #c62828;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.08), -2px -2px 4px rgba(255,255,255,0.6);
         }
 
         .history-action-btn.delete:hover {
-            background: #fef2f2;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08), inset -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         .article-nav {
@@ -412,78 +445,91 @@
         }
 
         .nav-arrow {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            color: #666;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 50%;
+            color: #7a7168;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -3px -3px 6px rgba(255,255,255,0.7);
         }
 
         .nav-arrow:hover {
-            border-color: #8b7355;
             color: #8b7355;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.12), -4px -4px 8px rgba(255,255,255,0.7);
+        }
+
+        .nav-arrow:active {
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         .nav-arrow:disabled {
             opacity: 0.3;
             cursor: not-allowed;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.06), -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         .article-indicator {
             font-size: 14px;
             font-weight: 500;
-            color: #333;
+            color: #5a5047;
         }
 
         .add-article-btn {
             margin-left: auto;
-            padding: 6px 14px;
-            background: transparent;
-            border: 1px solid #8b7355;
-            border-radius: 6px;
+            padding: 8px 16px;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 10px;
             color: #8b7355;
             font-size: 13px;
             font-family: inherit;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -3px -3px 6px rgba(255,255,255,0.7);
         }
 
         .add-article-btn:hover {
             background: #8b7355;
             color: white;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.15), -4px -4px 8px rgba(255,255,255,0.5);
+        }
+
+        .add-article-btn:active {
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15), inset -2px -2px 4px rgba(255,255,255,0.3);
         }
 
         .remove-article-btn {
             width: 100%;
             padding: 10px;
-            background: transparent;
-            border: 1px solid #fecaca;
-            border-radius: 6px;
-            color: #dc2626;
+            background: #e8e0d4;
+            border: none;
+            border-radius: 10px;
+            color: #c62828;
             font-size: 13px;
             font-family: inherit;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             margin-top: 4px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06), inset -2px -2px 4px rgba(255,255,255,0.5);
         }
 
         .remove-article-btn:hover {
-            background: #fef2f2;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.1), inset -3px -3px 6px rgba(255,255,255,0.5);
         }
 
         footer {
             text-align: center;
             margin-top: 32px;
-            color: #999;
+            color: #a09585;
             font-size: 13px;
         }
 
@@ -492,14 +538,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
-            background: #f5f5f5;
-            border-radius: 8px;
+            background: #e8e0d4;
+            border-radius: 12px;
             margin-bottom: 24px;
             font-size: 14px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
         }
 
         .user-bar .email {
-            color: #666;
+            color: #7a7168;
         }
 
         .user-bar .credits {
@@ -538,13 +585,14 @@
         .login-prompt {
             text-align: center;
             padding: 20px;
-            background: #fafafa;
-            border-radius: 8px;
+            background: #e8e0d4;
+            border-radius: 14px;
             margin-bottom: 24px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
         }
 
         .login-prompt p {
-            color: #666;
+            color: #7a7168;
             margin-bottom: 12px;
         }
 
@@ -554,9 +602,10 @@
             background: #8b7355;
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-weight: 500;
             font-size: 14px;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.12), -3px -3px 6px rgba(255,255,255,0.4);
         }
 
         .login-btn:hover {
@@ -566,6 +615,7 @@
         @media (max-width: 640px) {
             .form-card {
                 padding: 24px;
+                box-shadow: 6px 6px 12px rgba(0,0,0,0.08), -6px -6px 12px rgba(255,255,255,0.6);
             }
 
             h1 {
