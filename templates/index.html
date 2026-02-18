@@ -122,12 +122,24 @@
 
         .toggle-group {
             display: flex;
+            position: relative;
             background: #e8e0d4;
             border: none;
             border-radius: 24px;
             padding: 5px;
             margin-bottom: 24px;
             box-shadow: inset 3px 3px 6px rgba(0,0,0,0.08), inset -3px -3px 6px rgba(255,255,255,0.6);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 5px;
+            bottom: 5px;
+            border-radius: 20px;
+            background: #8b7355;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.15), -2px -2px 5px rgba(255,255,255,0.4);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
         }
 
         .toggle-btn {
@@ -141,13 +153,13 @@
             font-family: inherit;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: color 0.25s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .toggle-btn.active {
-            background: #8b7355;
             color: white;
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.15), -2px -2px 5px rgba(255,255,255,0.4);
         }
 
         .toggle-btn:hover:not(.active) {
@@ -644,6 +656,7 @@
                 <div class="form-group">
                     <label>Output Type</label>
                     <div class="toggle-group" id="output-toggle">
+                        <div class="toggle-slider" id="output-slider"></div>
                         <button type="button" class="toggle-btn" data-output="digest" onclick="setOutputType('digest')">Digest</button>
                         <button type="button" class="toggle-btn" data-output="social" onclick="setOutputType('social')">Social</button>
                         <button type="button" class="toggle-btn active" data-output="both" onclick="setOutputType('both')">Both</button>
@@ -654,6 +667,7 @@
                 <div class="form-group">
                     <label>Source</label>
                     <div class="toggle-group" id="source-toggle">
+                        <div class="toggle-slider" id="source-slider"></div>
                         <button type="button" class="toggle-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
                         <button type="button" class="toggle-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
                         <button type="button" class="toggle-btn" data-mode="paste" onclick="setMode('paste')">Paste Text</button>
@@ -777,14 +791,27 @@
         let pasteArticles = [{ title: '', author: '', content: '', url: '' }];
         let currentArticleIndex = 0;
 
+        // Slider animation
+        function moveSlider(toggleGroup, activeBtn) {
+            const slider = toggleGroup.querySelector('.toggle-slider');
+            if (!slider || !activeBtn) return;
+            const groupRect = toggleGroup.getBoundingClientRect();
+            const btnRect = activeBtn.getBoundingClientRect();
+            const offset = btnRect.left - groupRect.left - 5; // 5px padding
+            slider.style.width = btnRect.width + 'px';
+            slider.style.transform = 'translateX(' + offset + 'px)';
+        }
+
         // Output type toggle
         function setOutputType(type) {
             currentOutputType = type;
             document.getElementById('output_type').value = type;
 
-            document.querySelectorAll('#output-toggle .toggle-btn').forEach(btn => {
+            const toggle = document.getElementById('output-toggle');
+            toggle.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.output === type);
             });
+            moveSlider(toggle, toggle.querySelector('.toggle-btn.active'));
 
             const submitBtn = document.getElementById('submit-btn');
             if (type === 'digest') {
@@ -821,9 +848,11 @@
             currentMode = mode;
             document.getElementById('mode').value = mode;
 
-            document.querySelectorAll('#source-toggle .toggle-btn').forEach(btn => {
+            const toggle = document.getElementById('source-toggle');
+            toggle.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
+            moveSlider(toggle, toggle.querySelector('.toggle-btn.active'));
 
             const urlGroup = document.getElementById('url-group');
             const urlInput = document.getElementById('url');
@@ -998,6 +1027,27 @@
         });
 
         checkHistory();
+
+        // Initialize sliders on page load
+        function initSliders() {
+            const outputToggle = document.getElementById('output-toggle');
+            const sourceToggle = document.getElementById('source-toggle');
+            // Set initial position without animation
+            const outputSlider = document.getElementById('output-slider');
+            const sourceSlider = document.getElementById('source-slider');
+            outputSlider.style.transition = 'none';
+            sourceSlider.style.transition = 'none';
+            moveSlider(outputToggle, outputToggle.querySelector('.toggle-btn.active'));
+            moveSlider(sourceToggle, sourceToggle.querySelector('.toggle-btn.active'));
+            // Re-enable animation after initial position is set
+            requestAnimationFrame(() => {
+                outputSlider.style.transition = '';
+                sourceSlider.style.transition = '';
+            });
+        }
+        initSliders();
+        // Re-position on window resize
+        window.addEventListener('resize', initSliders);
     </script>
 </body>
 </html>
