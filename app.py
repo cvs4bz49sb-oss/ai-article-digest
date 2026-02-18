@@ -1,5 +1,6 @@
 """Flask web application for AI Article Digest Generator."""
 
+import json
 import os
 import secrets
 import smtplib
@@ -213,54 +214,108 @@ def generate():
     output_type = request.form.get("output_type", "both")  # digest, social, or both
     count = request.form.get("count", "10")
     specific_urls = request.form.get("specific_urls", "").strip()
+    pasted_articles_json = request.form.get("pasted_articles", "").strip()
+
+    # Handle separate counts for "both" mode
+    digest_count = request.form.get("digest_count", count)
+    social_count = request.form.get("social_count", count)
 
     try:
         count = int(count)
-        count = max(1, min(count, 20))  # Limit between 1 and 20
+        count = max(1, min(count, 20))
     except ValueError:
         count = 10
 
-    # For specific mode, URL is not required
-    if mode != "specific" and not url:
+    try:
+        digest_count = int(digest_count)
+        digest_count = max(1, min(digest_count, 20))
+    except (ValueError, TypeError):
+        digest_count = count
+
+    try:
+        social_count = int(social_count)
+        social_count = max(1, min(social_count, 20))
+    except (ValueError, TypeError):
+        social_count = count
+
+    # For non-paste, non-specific modes, URL is required
+    if mode not in ("specific", "paste") and not url:
         return render_template("index.html", error="Please enter a URL")
 
     if url and not url.startswith(("http://", "https://")):
         url = "https://" + url
 
     try:
-        scraper = ArticleScraper(url) if url else None
+        # Paste mode: build articles from pasted text
+        if mode == "paste" and pasted_articles_json:
+            try:
+                pasted_data = json.loads(pasted_articles_json)
+            except json.JSONDecodeError:
+                return render_template("index.html", error="Invalid article data")
 
-        if mode == "specific" and specific_urls:
-            # Parse specific URLs from textarea
-            urls_list = [u.strip() for u in specific_urls.split('\n') if u.strip()]
-            urls_list = [u if u.startswith(('http://', 'https://')) else 'https://' + u for u in urls_list]
+            if not pasted_data:
+                return render_template("index.html", error="Please add at least one article")
 
-            if not urls_list:
-                return render_template("index.html", error="Please provide at least one article URL")
+            from scraper import Article
+            articles = []
+            for item in pasted_data:
+                if item.get("title") and item.get("content"):
+                    articles.append(Article(
+                        title=item["title"],
+                        author=item.get("author", "Unknown Author"),
+                        content=item["content"][:10000],
+                        url=item.get("url", "")
+                    ))
 
-            # Create scraper from first URL's domain if not already created
-            if not scraper:
-                scraper = ArticleScraper(urls_list[0])
+            if not articles:
+                return render_template("index.html", error="Please add at least one article with title and content")
 
-            # Scrape specific articles
-            articles, site_name = scraper.scrape_specific_articles(urls_list)
+            site_name = request.form.get("paste_site_name", "").strip() or "the publication"
+
         else:
-            # Scrape recent articles
-            articles, site_name = scraper.scrape_articles(count)
+            scraper = ArticleScraper(url) if url else None
+
+            if mode == "specific" and specific_urls:
+                urls_list = [u.strip() for u in specific_urls.split('\n') if u.strip()]
+                urls_list = [u if u.startswith(('http://', 'https://')) else 'https://' + u for u in urls_list]
+
+                if not urls_list:
+                    return render_template("index.html", error="Please provide at least one article URL")
+
+                if not scraper:
+                    scraper = ArticleScraper(urls_list[0])
+
+                articles, site_name = scraper.scrape_specific_articles(urls_list)
+            else:
+                # Use the larger of the two counts for scraping
+                scrape_count = max(digest_count, social_count) if output_type == 'both' else count
+                articles, site_name = scraper.scrape_articles(scrape_count)
 
         if not articles:
-            return render_template("index.html", error="No articles found at that URL")
+            return render_template("index.html", error="No articles found")
 
         # Generate content based on output_type
         generator = DigestGenerator()
-        digest = generator.generate_digest(articles, site_name=site_name, output_type=output_type)
+        digest = generator.generate_digest(
+            articles,
+            site_name=site_name,
+            output_type=output_type,
+            digest_count=digest_count if output_type == 'both' else count,
+            social_count=social_count if output_type == 'both' else count
+        )
         formatted = generator.format_digest(digest) if output_type in ['digest', 'both'] else ""
+
+        display_url = url
+        if mode == "specific" and not url:
+            display_url = urls_list[0] if specific_urls else ""
+        elif mode == "paste":
+            display_url = site_name
 
         return render_template(
             "result.html",
             digest=digest,
             formatted=formatted,
-            url=url or urls_list[0] if mode == "specific" else url,
+            url=display_url,
             count=len(articles),
             output_type=output_type
         )

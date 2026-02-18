@@ -89,16 +89,25 @@ Combined summaries should move from the particular to the universal — naming s
 Pull a single concrete image or claim paired with the universal insight it supports. Let the image do the work. Do not explain the connection — trust the reader. Never beg. Never hype. Assume the reader will come because the ideas are worth engaging, not because you've created artificial urgency."""
 
 
-def create_summary_prompt(articles: list[Article], site_name: str = "the publication", output_type: str = "both") -> str:
+def create_summary_prompt(articles: list[Article], site_name: str = "the publication", output_type: str = "both", digest_articles: list[Article] = None, social_articles: list[Article] = None) -> str:
     """Create the prompt for generating summaries.
 
     Args:
-        articles: List of Article objects
+        articles: List of all Article objects
         site_name: Name of the publication
         output_type: 'digest', 'social', or 'both'
+        digest_articles: Articles to include in digest (for 'both' mode)
+        social_articles: Articles to generate social posts for (for 'both' mode)
     """
+    if digest_articles is None:
+        digest_articles = articles
+    if social_articles is None:
+        social_articles = articles
+
+    # Build article text from all unique articles
+    all_articles = list({id(a): a for a in list(digest_articles) + list(social_articles)}.values())
     articles_text = ""
-    for i, article in enumerate(articles, 1):
+    for i, article in enumerate(all_articles, 1):
         articles_text += f"""
 ---
 ARTICLE {i}
@@ -180,7 +189,14 @@ SUMMARY: [active verb] [rest of 50-word max summary - NO author name]
 CRITICAL: Each summary must START WITH A VERB like "examines", "argues", "traces", "frames", "contends", "looks at". DO NOT start with the author's name."""
 
     else:  # both
-        return f"""Generate a complete digest for the following {len(articles)} articles from {site_name}.
+        # Build specific article lists for digest and social
+        digest_titles = [a.title for a in digest_articles]
+        social_titles = [a.title for a in social_articles]
+
+        digest_instruction = f"Generate DIGEST SUMMARIES for these {len(digest_articles)} articles: {', '.join(f'Article titled \"{t}\"' for t in digest_titles)}"
+        social_instruction = f"Generate SOCIAL MEDIA POSTS for these {len(social_articles)} articles: {', '.join(f'Article titled \"{t}\"' for t in social_titles)}"
+
+        return f"""Generate a complete digest and social posts for articles from {site_name}.
 
 {articles_text}
 
@@ -199,14 +215,16 @@ Please provide:
 
    GOOD example (specific): "This week's Mere Orthodoxy Digest examines smartphone addiction through Tony Reinke's digital minimalism framework, traces J.C. Ryle's influence on Anglican pastoral care, and considers whether evangelical fractures stem from class conflict rather than theological disagreement."
 
-3. **INDIVIDUAL SUMMARIES**: For each article, provide:
+3. **INDIVIDUAL SUMMARIES**: {digest_instruction}
+   For each of these articles, provide:
    - The article title (exactly as given)
    - The author name (exactly as given)
    - A summary that STARTS WITH AN ACTIVE VERB (examines, argues, traces, frames, looks at, contends, etc.)
    - DO NOT include the author's name in the summary - it will be added automatically
    - Maximum 50 words per summary
 
-4. **SOCIAL MEDIA POSTS**: For each article, provide a social media post with:
+4. **SOCIAL MEDIA POSTS**: {social_instruction}
+   For each of these articles, provide a social media post with:
    - A compelling headline (can be the article title or a catchier version, max 10 words)
    - One sentence of compelling and accurate summary (different from the digest summary - more punchy and shareable)
    - The post should make people want to click and read the full article
@@ -248,7 +266,7 @@ class DigestGenerator:
             raise ValueError("ANTHROPIC_API_KEY not found. Please set it in your .env file.")
         self.client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
-    def generate_digest(self, articles: list[Article], progress_callback=None, site_name: str = "the publication", output_type: str = "both") -> dict:
+    def generate_digest(self, articles: list[Article], progress_callback=None, site_name: str = "the publication", output_type: str = "both", digest_count: int = None, social_count: int = None) -> dict:
         """Generate the complete digest for a list of articles.
 
         Args:
@@ -256,11 +274,27 @@ class DigestGenerator:
             progress_callback: Optional callback for progress updates
             site_name: Name of the publication
             output_type: 'digest', 'social', or 'both'
+            digest_count: Number of articles to include in digest (for 'both' mode)
+            social_count: Number of articles to generate social posts for (for 'both' mode)
         """
         if progress_callback:
             progress_callback("Sending articles to Claude for summarization...")
 
-        prompt = create_summary_prompt(articles, site_name=site_name, output_type=output_type)
+        # Determine which articles to use for each output type
+        if output_type == 'both' and digest_count and social_count:
+            digest_articles = articles[:digest_count]
+            social_articles = articles[:social_count]
+        else:
+            digest_articles = articles
+            social_articles = articles
+
+        prompt = create_summary_prompt(
+            articles,
+            site_name=site_name,
+            output_type=output_type,
+            digest_articles=digest_articles,
+            social_articles=social_articles
+        )
 
         message = self.client.messages.create(
             model=CLAUDE_MODEL,

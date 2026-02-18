@@ -400,6 +400,86 @@
             background: #fef2f2;
         }
 
+        .article-nav {
+            margin-bottom: 8px;
+        }
+
+        .article-nav-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .nav-arrow {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-arrow:hover {
+            border-color: #8b7355;
+            color: #8b7355;
+        }
+
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .article-indicator {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .add-article-btn {
+            margin-left: auto;
+            padding: 6px 14px;
+            background: transparent;
+            border: 1px solid #8b7355;
+            border-radius: 6px;
+            color: #8b7355;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-article-btn:hover {
+            background: #8b7355;
+            color: white;
+        }
+
+        .remove-article-btn {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            color: #dc2626;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 4px;
+        }
+
+        .remove-article-btn:hover {
+            background: #fef2f2;
+        }
+
         footer {
             text-align: center;
             margin-top: 32px;
@@ -526,8 +606,11 @@
                     <div class="toggle-group" id="source-toggle">
                         <button type="button" class="toggle-btn active" data-mode="recent" onclick="setMode('recent')">Recent Articles</button>
                         <button type="button" class="toggle-btn" data-mode="specific" onclick="setMode('specific')">Specific Links</button>
+                        <button type="button" class="toggle-btn" data-mode="paste" onclick="setMode('paste')">Paste Text</button>
                     </div>
                 </div>
+
+                <input type="hidden" id="pasted_articles" name="pasted_articles" value="">
 
                 <div class="form-group" id="url-group">
                     <label for="url">Website URL</label>
@@ -535,10 +618,25 @@
                 </div>
 
                 <div class="mode-content active" id="mode-recent">
-                    <div class="form-group">
-                        <label for="count">Number of Articles</label>
-                        <input type="number" id="count" name="count" value="10" min="1" max="20">
-                        <p class="help-text">1-20 recent articles from the site</p>
+                    <div class="form-group" id="count-group">
+                        <label for="count" id="count-label">Number of Articles</label>
+                        <div id="count-single">
+                            <input type="number" id="count" name="count" value="10" min="1" max="20">
+                            <p class="help-text">1-20 recent articles from the site</p>
+                        </div>
+                        <div id="count-split" style="display: none;">
+                            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <label for="digest_count" style="font-size: 13px; color: #666;">Digest articles</label>
+                                    <input type="number" id="digest_count" name="digest_count" value="10" min="1" max="20">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label for="social_count" style="font-size: 13px; color: #666;">Social posts</label>
+                                    <input type="number" id="social_count" name="social_count" value="10" min="1" max="20">
+                                </div>
+                            </div>
+                            <p class="help-text">Different counts for digest summaries and social posts</p>
+                        </div>
                     </div>
                 </div>
 
@@ -547,6 +645,41 @@
                         <label for="specific_urls">Article URLs</label>
                         <textarea id="specific_urls" name="specific_urls" placeholder="Paste article URLs here, one per line"></textarea>
                         <p class="help-text">One URL per line</p>
+                    </div>
+                </div>
+
+                <div class="mode-content" id="mode-paste">
+                    <div class="form-group">
+                        <label for="paste_site_name">Publication Name</label>
+                        <input type="text" id="paste_site_name" name="paste_site_name" placeholder="e.g. Mere Orthodoxy">
+                    </div>
+
+                    <div class="article-nav">
+                        <div class="article-nav-header">
+                            <button type="button" class="nav-arrow" onclick="prevArticle()">&#9664;</button>
+                            <span class="article-indicator" id="article-indicator">Article 1 of 1</span>
+                            <button type="button" class="nav-arrow" onclick="nextArticle()">&#9654;</button>
+                            <button type="button" class="add-article-btn" onclick="addArticle()">+ Add Article</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" id="paste-title" placeholder="Article title" oninput="savePasteField()">
+                        </div>
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input type="text" id="paste-author" placeholder="Author name" oninput="savePasteField()">
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <textarea id="paste-content" placeholder="Paste the full article text here..." style="min-height: 200px;" oninput="savePasteField()"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL</label>
+                            <input type="text" id="paste-url" placeholder="https://example.com/article" oninput="savePasteField()">
+                        </div>
+
+                        <button type="button" class="remove-article-btn" id="remove-article-btn" onclick="removeArticle()" style="display: none;">Remove this article</button>
                     </div>
                 </div>
 
@@ -586,8 +719,17 @@
     </div>
 
     <script>
+        // Current state
+        let currentOutputType = 'both';
+        let currentMode = 'recent';
+
+        // Paste mode article data
+        let pasteArticles = [{ title: '', author: '', content: '', url: '' }];
+        let currentArticleIndex = 0;
+
         // Output type toggle
         function setOutputType(type) {
+            currentOutputType = type;
             document.getElementById('output_type').value = type;
 
             document.querySelectorAll('#output-toggle .toggle-btn').forEach(btn => {
@@ -602,10 +744,31 @@
             } else {
                 submitBtn.textContent = 'Generate Both';
             }
+
+            updateCountVisibility();
+        }
+
+        function updateCountVisibility() {
+            if (currentMode === 'paste') return; // paste mode doesn't show counts
+
+            const countSingle = document.getElementById('count-single');
+            const countSplit = document.getElementById('count-split');
+            const countLabel = document.getElementById('count-label');
+
+            if (currentOutputType === 'both') {
+                countSingle.style.display = 'none';
+                countSplit.style.display = 'block';
+                countLabel.textContent = 'Number of Articles';
+            } else {
+                countSingle.style.display = 'block';
+                countSplit.style.display = 'none';
+                countLabel.textContent = currentOutputType === 'social' ? 'Number of Social Posts' : 'Number of Articles';
+            }
         }
 
         // Source mode toggle
         function setMode(mode) {
+            currentMode = mode;
             document.getElementById('mode').value = mode;
 
             document.querySelectorAll('#source-toggle .toggle-btn').forEach(btn => {
@@ -614,19 +777,99 @@
 
             const urlGroup = document.getElementById('url-group');
             const urlInput = document.getElementById('url');
+            const countGroup = document.getElementById('count-group');
             document.getElementById('mode-recent').classList.toggle('active', mode === 'recent');
             document.getElementById('mode-specific').classList.toggle('active', mode === 'specific');
+            document.getElementById('mode-paste').classList.toggle('active', mode === 'paste');
 
-            if (mode === 'specific') {
+            if (mode === 'paste') {
                 urlGroup.style.display = 'none';
                 urlInput.removeAttribute('required');
+                countGroup.style.display = 'none';
+            } else if (mode === 'specific') {
+                urlGroup.style.display = 'none';
+                urlInput.removeAttribute('required');
+                countGroup.style.display = 'block';
+                updateCountVisibility();
             } else {
                 urlGroup.style.display = 'block';
                 urlInput.setAttribute('required', '');
+                countGroup.style.display = 'block';
+                updateCountVisibility();
+            }
+        }
+
+        // Paste mode article navigation
+        function savePasteField() {
+            pasteArticles[currentArticleIndex] = {
+                title: document.getElementById('paste-title').value,
+                author: document.getElementById('paste-author').value,
+                content: document.getElementById('paste-content').value,
+                url: document.getElementById('paste-url').value
+            };
+        }
+
+        function loadArticle(index) {
+            currentArticleIndex = index;
+            const article = pasteArticles[index];
+            document.getElementById('paste-title').value = article.title || '';
+            document.getElementById('paste-author').value = article.author || '';
+            document.getElementById('paste-content').value = article.content || '';
+            document.getElementById('paste-url').value = article.url || '';
+            updateArticleNav();
+        }
+
+        function updateArticleNav() {
+            document.getElementById('article-indicator').textContent =
+                `Article ${currentArticleIndex + 1} of ${pasteArticles.length}`;
+
+            // Show/hide remove button (can't remove if only 1 article)
+            document.getElementById('remove-article-btn').style.display =
+                pasteArticles.length > 1 ? 'block' : 'none';
+        }
+
+        function addArticle() {
+            savePasteField();
+            pasteArticles.push({ title: '', author: '', content: '', url: '' });
+            loadArticle(pasteArticles.length - 1);
+        }
+
+        function removeArticle() {
+            if (pasteArticles.length <= 1) return;
+            pasteArticles.splice(currentArticleIndex, 1);
+            if (currentArticleIndex >= pasteArticles.length) {
+                currentArticleIndex = pasteArticles.length - 1;
+            }
+            loadArticle(currentArticleIndex);
+        }
+
+        function prevArticle() {
+            if (currentArticleIndex > 0) {
+                savePasteField();
+                loadArticle(currentArticleIndex - 1);
+            }
+        }
+
+        function nextArticle() {
+            if (currentArticleIndex < pasteArticles.length - 1) {
+                savePasteField();
+                loadArticle(currentArticleIndex + 1);
             }
         }
 
         document.getElementById('digest-form').addEventListener('submit', function() {
+            // If paste mode, serialize articles to hidden field
+            if (currentMode === 'paste') {
+                savePasteField();
+                // Filter out empty articles
+                const validArticles = pasteArticles.filter(a => a.title && a.content);
+                if (validArticles.length === 0) {
+                    alert('Please add at least one article with a title and content.');
+                    return false;
+                }
+                document.getElementById('pasted_articles').value = JSON.stringify(validArticles);
+            }
+
             document.getElementById('submit-btn').disabled = true;
             document.getElementById('digest-form').style.display = 'none';
             document.getElementById('history-btn').style.display = 'none';
