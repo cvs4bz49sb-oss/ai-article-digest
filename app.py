@@ -208,19 +208,6 @@ def history_view():
 @app.route("/generate", methods=["POST"])
 def generate():
     """Generate a digest from the submitted URL."""
-    # Check if user is logged in
-    if not is_logged_in():
-        session['next_url'] = url_for('index')
-        return redirect(url_for('login_page'))
-
-    user = get_current_user()
-    if not user:
-        return redirect(url_for('login_page'))
-
-    # Check if user has credits
-    if not can_generate(user):
-        return redirect(url_for('pricing_page'))
-
     url = request.form.get("url", "").strip()
     mode = request.form.get("mode", "recent")
     output_type = request.form.get("output_type", "both")  # digest, social, or both
@@ -235,7 +222,7 @@ def generate():
 
     # For specific mode, URL is not required
     if mode != "specific" and not url:
-        return render_template("index.html", error="Please enter a URL", user=user)
+        return render_template("index.html", error="Please enter a URL")
 
     if url and not url.startswith(("http://", "https://")):
         url = "https://" + url
@@ -249,7 +236,7 @@ def generate():
             urls_list = [u if u.startswith(('http://', 'https://')) else 'https://' + u for u in urls_list]
 
             if not urls_list:
-                return render_template("index.html", error="Please provide at least one article URL", user=user)
+                return render_template("index.html", error="Please provide at least one article URL")
 
             # Create scraper from first URL's domain if not already created
             if not scraper:
@@ -262,21 +249,7 @@ def generate():
             articles, site_name = scraper.scrape_articles(count)
 
         if not articles:
-            return render_template("index.html", error="No articles found at that URL", user=user)
-
-        # Use a credit (will return True for admins without deducting)
-        if not use_credit(user):
-            return redirect(url_for('pricing_page'))
-
-        # Record the generation
-        generation = Generation(
-            user_id=user.id,
-            url=url or urls_list[0] if mode == "specific" else url,
-            article_count=len(articles),
-            output_type=output_type
-        )
-        db.session.add(generation)
-        db.session.commit()
+            return render_template("index.html", error="No articles found at that URL")
 
         # Generate content based on output_type
         generator = DigestGenerator()
@@ -289,16 +262,15 @@ def generate():
             formatted=formatted,
             url=url or urls_list[0] if mode == "specific" else url,
             count=len(articles),
-            output_type=output_type,
-            user=user
+            output_type=output_type
         )
 
     except ValueError as e:
-        return render_template("index.html", error=str(e), user=user)
+        return render_template("index.html", error=str(e))
     except RuntimeError as e:
-        return render_template("index.html", error=str(e), user=user)
+        return render_template("index.html", error=str(e))
     except Exception as e:
-        return render_template("index.html", error=f"An error occurred: {str(e)}", user=user)
+        return render_template("index.html", error=f"An error occurred: {str(e)}")
 
 
 @app.route("/api/generate", methods=["POST"])

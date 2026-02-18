@@ -505,26 +505,6 @@
         <div class="error">{{ error }}</div>
         {% endif %}
 
-        {% if user %}
-        <div class="user-bar">
-            <span class="email">{{ user.email }}</span>
-            <div class="credits">
-                {% if user.is_admin %}
-                <span class="credit-badge admin">Unlimited</span>
-                {% else %}
-                <span class="credit-badge {% if user.credits == 0 %}low{% endif %}">{{ user.credits }} credit{% if user.credits != 1 %}s{% endif %}</span>
-                <a href="/pricing" class="user-link">Buy more</a>
-                {% endif %}
-                <a href="/auth/logout" class="user-link">Sign out</a>
-            </div>
-        </div>
-        {% else %}
-        <div class="login-prompt">
-            <p>Sign in to generate digests</p>
-            <a href="/login" class="login-btn">Sign In</a>
-        </div>
-        {% endif %}
-
         <div class="form-card">
             <form action="/generate" method="POST" id="digest-form">
                 <input type="hidden" id="mode" name="mode" value="recent">
