@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Digest - Well Done Digest</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -15,8 +12,8 @@
         }
 
         body {
-            font-family: 'Lora', Georgia, serif;
-            background: #e0e0e0;
+            font-family: Georgia, serif;
+            background: #faf9f7;
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -26,30 +23,31 @@
         }
 
         .container {
-            background: #e0e0e0;
-            border-radius: 24px;
+            background: #ffffff;
+            border-radius: 12px;
             padding: 48px;
             max-width: 720px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.1), -10px -10px 20px rgba(255,255,255,0.7);
+            border: 1px solid #e0dcd4;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
-            color: #8b7355;
+            color: #8b6914;
             text-decoration: none;
             font-size: 14px;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
             font-weight: 500;
             margin-bottom: 32px;
             transition: color 0.2s;
         }
 
         .back-link:hover {
-            color: #6b5a45;
+            color: #6b5510;
         }
 
         .back-link svg {
@@ -58,15 +56,15 @@
 
         .history-badge {
             display: inline-block;
-            background: #e0e0e0;
-            color: #8b7355;
+            background: #f5f3f0;
+            color: #8b6914;
             font-size: 12px;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
             font-weight: 500;
             padding: 6px 16px;
             border-radius: 20px;
             margin-bottom: 16px;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.06), inset -2px -2px 4px rgba(255,255,255,0.5);
+            border: 1px solid #e0dcd4;
         }
 
         .headline {
@@ -90,9 +88,9 @@
         }
 
         .section-title {
-            color: #8b7355;
+            color: #8b6914;
             font-size: 14px;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -114,7 +112,7 @@
 
         .article-number {
             color: #999999;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
             font-size: 13px;
             font-weight: 500;
             margin-right: 8px;
@@ -128,13 +126,13 @@
         }
 
         .article-title a {
-            color: #8b7355;
+            color: #8b6914;
             text-decoration: none;
             transition: color 0.2s;
         }
 
         .article-title a:hover {
-            color: #6b5a45;
+            color: #6b5510;
         }
 
         .article-content {
@@ -150,7 +148,7 @@
             margin-top: 40px;
             padding-top: 0;
             border-top: none;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
         }
 
         .btn {
@@ -165,40 +163,43 @@
         }
 
         .btn-primary {
-            background: #8b7355;
+            background: #8b6914;
             color: white;
             border: none;
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.12), -4px -4px 8px rgba(255,255,255,0.4);
+            border-radius: 6px;
+            box-shadow: none;
         }
 
         .btn-primary:hover {
-            background: #7a6548;
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.15), -5px -5px 10px rgba(255,255,255,0.4);
+            background: #7a5c11;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
 
         .btn-primary:active {
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
         }
 
         .btn-secondary {
-            background: #e0e0e0;
-            color: #6b6b6b;
-            border: none;
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.08), -4px -4px 8px rgba(255,255,255,0.6);
+            background: #ffffff;
+            color: #888888;
+            border: 1px solid #e0dcd4;
+            border-radius: 6px;
+            box-shadow: none;
         }
 
         .btn-secondary:hover {
             color: #1a1a1a;
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.1), -5px -5px 10px rgba(255,255,255,0.6);
+            background: #f5f3f0;
+            box-shadow: none;
         }
 
         .btn-secondary:active {
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08), inset -2px -2px 4px rgba(255,255,255,0.5);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .copy-success {
             display: none;
-            color: #8b7355;
+            color: #8b6914;
             font-size: 14px;
             margin-left: 12px;
             align-items: center;
@@ -213,23 +214,24 @@
             margin-top: 32px;
             color: #999999;
             font-size: 12px;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
         }
 
         .loading-message {
             text-align: center;
-            color: #8b7355;
+            color: #8b6914;
             padding: 60px 20px;
         }
 
         .loading-message a {
-            color: #8b7355;
+            color: #8b6914;
         }
 
         @media (max-width: 640px) {
             .container {
                 padding: 32px 24px;
-                box-shadow: 6px 6px 12px rgba(0,0,0,0.08), -6px -6px 12px rgba(255,255,255,0.6);
+                border-radius: 12px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.06);
             }
 
             .headline {
@@ -375,10 +377,9 @@
                 <html>
                 <head>
                     <title>${escapeHtml(digest.headline)}</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
                     <style>
                         body {
-                            font-family: 'Lora', Georgia, serif;
+                            font-family: Georgia, serif;
                             max-width: 700px;
                             margin: 40px auto;
                             padding: 20px;
