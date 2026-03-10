@@ -193,8 +193,10 @@ CRITICAL: Each summary must START WITH A VERB like "examines", "argues", "traces
         digest_titles = [a.title for a in digest_articles]
         social_titles = [a.title for a in social_articles]
 
-        digest_instruction = f"Generate DIGEST SUMMARIES for these {len(digest_articles)} articles: {', '.join(f'Article titled \"{t}\"' for t in digest_titles)}"
-        social_instruction = f"Generate SOCIAL MEDIA POSTS for these {len(social_articles)} articles: {', '.join(f'Article titled \"{t}\"' for t in social_titles)}"
+        digest_list = ', '.join(f'Article titled "{t}"' for t in digest_titles)
+        social_list = ', '.join(f'Article titled "{t}"' for t in social_titles)
+        digest_instruction = f"Generate DIGEST SUMMARIES for these {len(digest_articles)} articles: {digest_list}"
+        social_instruction = f"Generate SOCIAL MEDIA POSTS for these {len(social_articles)} articles: {social_list}"
 
         return f"""Generate a complete digest and social posts for articles from {site_name}.
 
