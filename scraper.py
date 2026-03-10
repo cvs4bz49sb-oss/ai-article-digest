@@ -200,11 +200,39 @@ class ArticleScraper:
         """Check if a URL is a Substack article URL (contains /p/)."""
         return "/p/" in url.lower()
 
+    def _extract_link_from_card(self, card, base_domain: str) -> Optional[str]:
+        """Extract an article link from a card element, checking both inside and parent."""
+        # First check for a link inside the card
+        link = card.find("a", href=True)
+        if not link:
+            # Check if the card is wrapped by a link (parent <a> tag)
+            parent = card.parent
+            if parent and parent.name == "a" and parent.get("href"):
+                link = parent
+        if link:
+            href = link.get("href", "")
+            full_url = urljoin(self.base_url, href)
+            parsed_url = urlparse(full_url)
+            if (self._is_article_url(full_url) and
+                base_domain in parsed_url.netloc):
+                return full_url
+        return None
+
     def _extract_article_links(self, soup: BeautifulSoup) -> list[str]:
         """Extract article links from the main page."""
         links = []
         parsed_base = urlparse(self.base_url)
         base_domain = parsed_base.netloc
+
+        # Collect featured/hero article links separately so they don't prevent
+        # finding the rest of the articles via later strategies.
+        featured_links = []
+        featured_selectors = [".today-featured-card", "[class*='featured-card']", "[class*='hero-card']"]
+        for selector in featured_selectors:
+            for card in soup.select(selector):
+                full_url = self._extract_link_from_card(card, base_domain)
+                if full_url and full_url not in featured_links:
+                    featured_links.append(full_url)
 
         # Strategy 0: Look for Substack article links (/p/ pattern)
         for link in soup.find_all("a", href=True):
@@ -217,6 +245,10 @@ class ArticleScraper:
                     links.append(full_url)
 
         if links:
+            # Prepend featured links that aren't already in the list
+            for fl in reversed(featured_links):
+                if fl not in links:
+                    links.insert(0, fl)
             return links
 
         # Strategy 1: Look for card-based layouts (like Mere Orthodoxy, Unchained)
@@ -236,14 +268,9 @@ class ArticleScraper:
             cards = soup.select(selector)
             if cards:
                 for card in cards:
-                    link = card.find("a", href=True)
-                    if link:
-                        href = link.get("href", "")
-                        full_url = urljoin(self.base_url, href)
-                        if (self._is_article_url(full_url) and
-                            base_domain in urlparse(full_url).netloc and
-                            full_url not in links):
-                            links.append(full_url)
+                    full_url = self._extract_link_from_card(card, base_domain)
+                    if full_url and full_url not in links:
+                        links.append(full_url)
                 if links:
                     break
 
@@ -320,6 +347,11 @@ class ArticleScraper:
                     # Has multiple path segments (likely an article)
                     if full_url not in links:
                         links.append(full_url)
+
+        # Prepend any featured article links found earlier
+        for fl in reversed(featured_links):
+            if fl not in links:
+                links.insert(0, fl)
 
         return links
 
